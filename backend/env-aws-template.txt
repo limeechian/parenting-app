@@ -1,0 +1,17 @@
+# Database Configuration
+DATABASE_URL=postgresql://username:password@your-rds-endpoint:5432/parenting_app
+
+# Security
+SECRET_KEY=your-secret-key-here
+
+# OpenAI Configuration
+OPENAI_API_KEY=your-openai-api-key
+
+# Firebase Configuration
+FIREBASE_CLIENT_ID=your-firebase-client-id
+FIREBASE_PROJECT_ID=your-firebase-project-id
+
+# AWS Configuration (for Lambda)
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your-access-key
+AWS_SECRET_ACCESS_KEY=your-secret-key 
