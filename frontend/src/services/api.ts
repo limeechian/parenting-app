@@ -3,9 +3,8 @@ import { UserInput, ChatInput } from '../types/types';
 
 // const API_BASE_URL = 'http://localhost:8000';
 // const API_BASE_URL = 'https://5e0em7cm60.execute-api.ap-southeast-2.amazonaws.com/prod';
-//const API_BASE_URL = 'http://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
-const API_BASE_URL = 'https://2fayughxfh.execute-api.ap-southeast-2.amazonaws.com/prod';
-//const API_BASE_URL = 'http://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
+const API_BASE_URL = 'http://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
+//const API_BASE_URL = 'https://2fayughxfh.execute-api.ap-southeast-2.amazonaws.com/prod';
 //const API_BASE_URL = 'http://3.26.204.206:8000';
 
 // Common fetch options to handle mixed content and CORS
@@ -120,5 +119,36 @@ export const deleteChild = async (childId: string) => {
     credentials: 'include',
   });
   if (!res.ok) throw new Error('Failed to delete child');
+  return res.json();
+};
+
+// Chat and conversation functions
+export const getConversations = async () => {
+  const res = await makeRequest(`${API_BASE_URL}/api/conversations`, {
+    mode: 'cors',
+    credentials: 'include'
+  });
+  if (!res.ok) throw new Error('Failed to fetch conversations');
+  return res.json();
+};
+
+export const getConversationMessages = async (conversationId: string) => {
+  const res = await makeRequest(`${API_BASE_URL}/api/conversations/${conversationId}/messages`, {
+    mode: 'cors',
+    credentials: 'include'
+  });
+  if (!res.ok) throw new Error('Failed to fetch conversation messages');
+  return res.json();
+};
+
+export const sendChat = async (input: { query: string; child_id?: number; conversation_id?: number; manual_agent?: string }) => {
+  const res = await makeRequest(`${API_BASE_URL}/api/chat`, getFetchOptions('POST', input));
+  if (!res.ok) throw new Error('Failed to send chat message');
+  return res.json();
+};
+
+export const updateConversationMetadata = async (conversationId: string, metadata: any) => {
+  const res = await makeRequest(`${API_BASE_URL}/api/conversations/${conversationId}/update-metadata`, getFetchOptions('PUT', metadata));
+  if (!res.ok) throw new Error('Failed to update conversation metadata');
   return res.json();
 };
