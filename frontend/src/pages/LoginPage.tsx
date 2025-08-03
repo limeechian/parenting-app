@@ -6,9 +6,12 @@ import { signInWithGoogle } from '../firebase';
 import { Heart, Shield, Sparkles, ArrowRight } from 'lucide-react';
 
 //const API_BASE_URL = 'https://5e0em7cm60.execute-api.ap-southeast-2.amazonaws.com/prod';
-const API_BASE_URL = 'http://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
+//const API_BASE_URL = 'http://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
 //const API_BASE_URL = 'https://2fayughxfh.execute-api.ap-southeast-2.amazonaws.com/prod';
 //const API_BASE_URL = 'http://localhost:8000';
+// const API_BASE_URL = 'http://localhost:8000'; // For local development
+const API_BASE_URL = 'https://parenzing.com'; // For production
+
 
 const LoginPage: React.FC = () => {
   const [identifier, setIdentifier] = useState('');
