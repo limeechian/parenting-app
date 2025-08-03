@@ -6,12 +6,32 @@ import { UserInput, ChatInput } from '../types/types';
 const API_BASE_URL = 'http://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
 //const API_BASE_URL = 'http://3.26.204.206:8000';
 
+// Common fetch options to handle mixed content and CORS
+const getFetchOptions = (method: string, body?: any, additionalHeaders?: Record<string, string>) => {
+  const options: RequestInit = {
+    method,
+    mode: 'cors' as RequestMode,
+    credentials: 'include' as RequestCredentials,
+    headers: {
+      'Content-Type': 'application/json',
+      ...additionalHeaders
+    }
+  };
+  
+  if (body) {
+    options.body = typeof body === 'string' ? body : JSON.stringify(body);
+  }
+  
+  return options;
+};
+
 export const sendLogin = async (input: { email: string; password: string }) => {
   const formData = new URLSearchParams();
   formData.append('username', input.email);
   formData.append('password', input.password);
   const res = await fetch(`${API_BASE_URL}/auth/jwt/login`, {
     method: 'POST',
+    mode: 'cors',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: formData.toString(),
     credentials: 'include',
@@ -21,11 +41,14 @@ export const sendLogin = async (input: { email: string; password: string }) => {
 };
 
 export const sendSignup = async (input: UserInput) => {
+  /*
   const res = await fetch(`${API_BASE_URL}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input),
   });
+  */
+  const res = await fetch(`${API_BASE_URL}/auth/register`, getFetchOptions('POST', input));
   if (!res.ok) throw new Error('Signup failed');
   return res.json();
 };
@@ -33,6 +56,7 @@ export const sendSignup = async (input: UserInput) => {
 export const googleSignIn = async (idToken: string, email: string) => {
   const res = await fetch(`${API_BASE_URL}/auth/google`, {
     method: 'POST',
+    mode: 'cors',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${idToken}`,
@@ -45,46 +69,45 @@ export const googleSignIn = async (idToken: string, email: string) => {
 };
 
 export const getParentProfile = async () => {
-  const res = await fetch(`${API_BASE_URL}/profile/parent`, { credentials: 'include' });
+  const res = await fetch(`${API_BASE_URL}/profile/parent`, {
+    mode: 'cors',
+    credentials: 'include'
+  });
   if (!res.ok) throw new Error('Failed to fetch parent profile');
   return res.json();
 };
 
 export const updateParentProfile = async (profile: any) => {
+  /*
   const res = await fetch(`${API_BASE_URL}/profile/parent`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
     body: JSON.stringify(profile),
   });
+  */
+  const res = await fetch(`${API_BASE_URL}/profile/parent`, getFetchOptions('POST', profile));
   if (!res.ok) throw new Error('Failed to update parent profile');
   return res.json();
 };
 
 export const getChildren = async () => {
-  const res = await fetch(`${API_BASE_URL}/profile/children`, { credentials: 'include' });
+  const res = await fetch(`${API_BASE_URL}/profile/children`, {
+    mode: 'cors',
+    credentials: 'include'
+  });
   if (!res.ok) throw new Error('Failed to fetch children');
   return res.json();
 };
 
 export const addChild = async (child: any) => {
-  const res = await fetch(`${API_BASE_URL}/profile/children`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
-    body: JSON.stringify(child),
-  });
+  const res = await fetch(`${API_BASE_URL}/profile/children`, getFetchOptions('POST', child));
   if (!res.ok) throw new Error('Failed to add child');
   return res.json();
 };
 
 export const updateChild = async (childId: string, child: any) => {
-  const res = await fetch(`${API_BASE_URL}/profile/children/${childId}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
-    body: JSON.stringify(child),
-  });
+  const res = await fetch(`${API_BASE_URL}/profile/children/${childId}`, getFetchOptions('PUT', child));
   if (!res.ok) throw new Error('Failed to update child');
   return res.json();
 };
@@ -92,6 +115,7 @@ export const updateChild = async (childId: string, child: any) => {
 export const deleteChild = async (childId: string) => {
   const res = await fetch(`${API_BASE_URL}/profile/children/${childId}`, {
     method: 'DELETE',
+    mode: 'cors',
     credentials: 'include',
   });
   if (!res.ok) throw new Error('Failed to delete child');
