@@ -686,6 +686,10 @@ async def google_auth(request: Request, db: AsyncSession = Depends(get_session))
     )
 '''    
 
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "message": "Service is running"}
+
 @app.get("/test")
 async def test_endpoint():
     return {"message": "Backend is working!"}
