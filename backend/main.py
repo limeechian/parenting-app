@@ -198,6 +198,26 @@ async def options_handler(full_path: str, request: Request):
     response.headers["Access-Control-Max-Age"] = "86400"
     return response
 
+# Add explicit OPTIONS handler for auth endpoints
+@app.options("/auth/{full_path:path}")
+async def auth_options_handler(full_path: str, request: Request):
+    from fastapi.responses import Response
+    response = Response(content="OK", status_code=200)
+    # Allow multiple origins
+    origin = request.headers.get("origin", "http://localhost:3000")
+    allowed_origins = [
+        "http://localhost:3000",
+        "https://master.dcmcchu8q16tm.amplifyapp.com",
+        "https://dcmcchu8q16tm.amplifyapp.com"
+    ]
+    if origin in allowed_origins:
+        response.headers["Access-Control-Allow-Origin"] = origin
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Max-Age"] = "86400"
+    return response
+
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     print(f"Request: {request.method} {request.url}")
