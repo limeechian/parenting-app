@@ -164,7 +164,11 @@ def verify_firebase_token(token: str):
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # React dev server
+    allow_origins=[
+        "http://localhost:3000",  # React dev server
+        "https://master.dcmcchu8q16tm.amplifyapp.com",  # Production frontend
+        "https://dcmcchu8q16tm.amplifyapp.com"  # Alternative frontend URL
+    ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization", "X-Requested-With", "Accept"],
@@ -172,11 +176,22 @@ app.add_middleware(
 )
 
 # Add explicit OPTIONS handler for all routes
-@app.options("/{full_path:path}")
-async def options_handler(full_path: str):
+#@app.options("/{full_path:path}")
+# Add explicit OPTIONS handler for API routes only (not root or health endpoints)
+@app.options("/api/{full_path:path}")
+#async def options_handler(full_path: str):
+async def options_handler(full_path: str, request: Request):
     from fastapi.responses import Response
     response = Response(content="OK", status_code=200)
-    response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+    # Allow multiple origins
+    origin = request.headers.get("origin", "http://localhost:3000")
+    allowed_origins = [
+        "http://localhost:3000",
+        "https://master.dcmcchu8q16tm.amplifyapp.com",
+        "https://dcmcchu8q16tm.amplifyapp.com"
+    ]
+    if origin in allowed_origins:
+        response.headers["Access-Control-Allow-Origin"] = origin
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
     response.headers["Access-Control-Allow-Credentials"] = "true"
@@ -685,6 +700,10 @@ async def google_auth(request: Request, db: AsyncSession = Depends(get_session))
         samesite=get_samesite(cookie_transport.cookie_samesite),
     )
 '''    
+
+@app.get("/")
+async def root():
+    return {"message": "Parenting App Backend API", "status": "running"}
 
 @app.get("/health")
 async def health_check():

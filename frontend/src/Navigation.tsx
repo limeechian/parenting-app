@@ -34,21 +34,23 @@ const Navigation: React.FC = () => {
   const [user, setUser] = useState({ name: 'Parent', role: 'parent', avatar: '' });
 
   useEffect(() => {
-    //fetch('http://localhost:8000/profile/parent', { credentials: 'include' })
-    //fetch('https://5e0em7cm60.execute-api.ap-southeast-2.amazonaws.com/prod/profile/parent', { credentials: 'include' })
-    fetch('http://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com/profile/parent', { credentials: 'include' })
-      .then(res => res.json())
-      .then(data => {
-        setUser({
-          name: data.username || data.full_name || 'Parent',
-          role: 'parent',
-          avatar: '', // or data.avatar if you have it
+    // Only fetch user profile if we're on a protected route
+    const protectedRoutes = ['/parent-dashboard', '/ai-chat', '/profile'];
+    if (protectedRoutes.some(route => location.pathname.startsWith(route))) {
+      fetch('https://2fayughxfh.execute-api.ap-southeast-2.amazonaws.com/prod/profile/parent', { credentials: 'include' })
+        .then(res => res.json())
+        .then(data => {
+          setUser({
+            name: data.username || data.full_name || 'Parent',
+            role: 'parent',
+            avatar: '', // or data.avatar if you have it
+          });
+        })
+        .catch(() => {
+          setUser({ name: 'Parent', role: 'parent', avatar: '' });
         });
-      })
-      .catch(() => {
-        setUser({ name: 'Parent', role: 'parent', avatar: '' });
-      });
-  }, []);
+    }
+  }, [location.pathname]);
 
   const isActive = (path: string) => location.pathname === path;
 
