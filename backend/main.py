@@ -498,17 +498,22 @@ from fastapi_users import schemas as fausers_schemas
 class UserRead(fausers_schemas.BaseUser[int]):
     username: str
     role: str
-    google_id: str | None = None
+    google_id: Optional[str] = None
+    #google_id: str | None = None
 
 class UserCreate(fausers_schemas.BaseUserCreate):
     username: str
     role: str
-    google_id: str | None = None
+    google_id: Optional[str] = None
+    #google_id: str | None = None
 
 class UserUpdate(fausers_schemas.BaseUserUpdate):
-    username: str | None = None
-    role: str | None = None
-    google_id: str | None = None
+    username: Optional[str] = None
+    role: Optional[str] = None
+    google_id: Optional[str] = None
+    #username: str | None = None
+    #role: str | None = None
+    #google_id: str | None = None
 
 # UserManager with on_after_register hook
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):

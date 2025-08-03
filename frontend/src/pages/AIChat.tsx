@@ -61,7 +61,7 @@ interface ConfirmationDialog {
 }
 
 //const API_BASE_URL = 'http://localhost:8000';
-const API_BASE_URL = 'https://5e0em7cm60.execute-api.ap-southeast-2.amazonaws.com/prod';
+const API_BASE_URL = 'http://3.26.204.206:8000';
 
 const AIChat: React.FC = () => {
   const navigate = useNavigate();

@@ -6,7 +6,8 @@ import { signInWithGoogle } from '../firebase';
 import { Users, Shield, Sparkles, ArrowRight, Heart, Star } from 'lucide-react';
 
 //const API_BASE_URL = 'http://localhost:8000';
-const API_BASE_URL = 'https://5e0em7cm60.execute-api.ap-southeast-2.amazonaws.com/prod';
+//const API_BASE_URL = 'https://5e0em7cm60.execute-api.ap-southeast-2.amazonaws.com/prod';
+const API_BASE_URL = 'http://3.26.204.206:8000';
 
 const SignupPage: React.FC = () => {
   const [email, setEmail] = useState('');
