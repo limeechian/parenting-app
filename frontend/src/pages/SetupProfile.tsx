@@ -39,7 +39,7 @@ import {
 } from 'lucide-react';
 
 //const API_BASE_URL = 'http://localhost:8000';
-const API_BASE_URL = 'http://3.26.204.206:8000';
+  const API_BASE_URL = 'http://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
 
 const defaultParentProfile = {
   full_name: '',
