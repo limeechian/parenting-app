@@ -10,12 +10,13 @@ fastapi-users[sqlalchemy]==14.0.1
 alembic==1.14.1
 psycopg2-binary==2.9.10
 asyncpg==0.30.0
-crewai==0.148.0
-langchain==0.3.12
-langchain-openai==0.2.12
-langchain-community==0.3.12
-openai==1.73.0
-faiss-cpu==1.11.0
+crewai==0.1.32
+langchain==0.1.0
+langchain-openai==0.0.2
+langchain-community==0.0.9
+openai>=1.70.0
+# faiss-cpu==1.9.0  # Removed - using pgvector instead
 numpy==1.26.4
 google-auth==2.40.3
-requests==2.32.3 
+requests==2.32.3
+mangum==0.17.0 

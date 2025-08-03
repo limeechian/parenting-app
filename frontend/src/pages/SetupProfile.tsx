@@ -38,7 +38,8 @@ import {
   Shield
 } from 'lucide-react';
 
-const API_BASE_URL = 'http://localhost:8000';
+//const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'https://5e0em7cm60.execute-api.ap-southeast-2.amazonaws.com/prod';
 
 const defaultParentProfile = {
   full_name: '',
@@ -104,7 +105,7 @@ const SetupProfile: React.FC = () => {
       try {
         // Parent profile
         //const parentRes = await fetch(`${API_BASE_URL}/profile/parent`, { credentials: 'include' });
-        const parentRes = await fetch('http://localhost:8000/profile/parent', {
+        const parentRes = await fetch(`${API_BASE_URL}/profile/parent`, {
           credentials: 'include',
         });
         if (parentRes.ok) {
@@ -141,7 +142,7 @@ const SetupProfile: React.FC = () => {
     setError('');
     try {
       //const res = await fetch(`${API_BASE_URL}/profile/parent`, {
-      const res = await fetch('http://localhost:8000/profile/parent', {
+              const res = await fetch(`${API_BASE_URL}/profile/parent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

@@ -65,3 +65,11 @@ logs/
 # Temporary files
 *.tmp
 *.temp 
+
+# Testing files
+test_*.py
+debug_*.py
+check_*.py
+fix_*.py
+*.sql
+test_*.js

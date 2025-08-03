@@ -1,0 +1,14 @@
+# Core FastAPI and web framework
+fastapi==0.115.9
+mangum==0.17.0
+
+# Data validation
+pydantic==2.10.4
+
+# Environment and configuration
+python-dotenv==1.0.1
+
+# Basic utilities
+requests==2.32.3
+async-timeout==4.0.3
+exceptiongroup==1.2.0 

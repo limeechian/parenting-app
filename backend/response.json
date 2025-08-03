@@ -1,0 +1,1 @@
+{"statusCode": 500, "headers": {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "Content-Type", "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS"}, "body": "{\"error\": \"Authentication failed\", \"message\": \"Invalid token: Not enough segments\", \"timestamp\": \"2025-08-03T05:59:56.434501\"}"}

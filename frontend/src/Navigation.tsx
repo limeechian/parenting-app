@@ -34,7 +34,8 @@ const Navigation: React.FC = () => {
   const [user, setUser] = useState({ name: 'Parent', role: 'parent', avatar: '' });
 
   useEffect(() => {
-    fetch('http://localhost:8000/profile/parent', { credentials: 'include' })
+    //fetch('http://localhost:8000/profile/parent', { credentials: 'include' })
+    fetch('https://5e0em7cm60.execute-api.ap-southeast-2.amazonaws.com/prod/profile/parent', { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         setUser({

@@ -5,7 +5,8 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { signInWithGoogle } from '../firebase';
 import { Users, Shield, Sparkles, ArrowRight, Heart, Star } from 'lucide-react';
 
-const API_BASE_URL = 'http://localhost:8000';
+//const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'https://5e0em7cm60.execute-api.ap-southeast-2.amazonaws.com/prod';
 
 const SignupPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -90,7 +91,7 @@ const SignupPage: React.FC = () => {
       localStorage.setItem('userEmail', result.user.email || '');
   
       // Send the token to your backend for authentication/registration
-      const response = await fetch("http://localhost:8000/auth/google", {
+      const response = await fetch(`${API_BASE_URL}/auth/google`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

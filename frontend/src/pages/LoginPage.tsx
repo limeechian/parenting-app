@@ -5,7 +5,8 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { signInWithGoogle } from '../firebase';
 import { Heart, Shield, Sparkles, ArrowRight } from 'lucide-react';
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'https://5e0em7cm60.execute-api.ap-southeast-2.amazonaws.com/prod';
+//const API_BASE_URL = 'http://localhost:8000';
 
 const LoginPage: React.FC = () => {
   const [identifier, setIdentifier] = useState('');
@@ -46,7 +47,7 @@ const LoginPage: React.FC = () => {
   
       // Fetch parent profile to check completion
       //const profileRes = await fetch(`${API_BASE_URL}/profile/parent`, {
-      const profileRes = await fetch('http://localhost:8000/profile/parent', {
+      const profileRes = await fetch(`${API_BASE_URL}/profile/parent`, {
         credentials: 'include',
       });
       if (profileRes.ok) {
@@ -95,7 +96,7 @@ const LoginPage: React.FC = () => {
       localStorage.setItem('userEmail', result.user.email || '');
 
       // Send the token to your backend for authentication/registration
-      const response = await fetch("http://localhost:8000/auth/google", {
+              const response = await fetch(`${API_BASE_URL}/auth/google`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

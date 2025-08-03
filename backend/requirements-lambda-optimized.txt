@@ -1,0 +1,35 @@
+# Core FastAPI and web framework
+fastapi==0.115.9
+uvicorn[standard]==0.32.1
+mangum==0.17.0
+
+# Database
+sqlalchemy==2.0.41
+psycopg2-binary==2.9.10
+asyncpg==0.30.0
+
+# Authentication and security
+fastapi-users[sqlalchemy]==12.1.3
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.7
+
+# Data validation and serialization
+pydantic==2.10.4
+
+# Environment and configuration
+python-dotenv==1.0.1
+
+# AI/ML components (only what's actually used)
+langchain-openai==0.0.2
+langchain-core==0.1.53
+openai>=1.70.0
+tiktoken==0.5.2
+
+# CrewAI (only if actually used in the optimized function)
+crewai==0.1.32
+
+# Utilities
+requests==2.32.3
+numpy==1.26.4
+async-timeout==4.0.3 

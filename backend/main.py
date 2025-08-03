@@ -3,6 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi_users import FastAPIUsers, BaseUserManager, IntegerIDMixin
 from fastapi_users.authentication import CookieTransport, AuthenticationBackend, JWTStrategy
+from fastapi_users.password import PasswordHelper
+
+# Using older version of fastapi-users to avoid Argon2 dependency issues
 from fastapi_users.db import SQLAlchemyUserDatabase, SQLAlchemyBaseUserTable
 from fastapi.responses import Response
 from fastapi_users.schemas import BaseUser, BaseUserCreate as FastAPIBaseUserCreate
@@ -41,7 +44,7 @@ from langchain_core.runnables import RunnableConfig
 #from langchain.vectorstores import FAISS
 from langchain.schema import Document
 from langchain_openai import OpenAIEmbeddings
-from langchain_community.vectorstores import FAISS
+# Removed FAISS import since we're using pgvector instead
 
 from crewai import Agent, Crew, Task
 from crewai_agents import execute_crewai_response, determine_primary_agent
@@ -68,7 +71,7 @@ import base64
 import requests
 import inspect
 import openai
-import faiss
+# import faiss  # Removed since we're using pgvector
 import numpy as np
 from passlib.context import CryptContext
 import re
@@ -103,7 +106,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")  # This is the secret key for the JWT token
 FIREBASE_CLIENT_ID = os.getenv("FIREBASE_CLIENT_ID")
 FIREBASE_PROJECT_ID = os.getenv("FIREBASE_PROJECT_ID")
 EMBEDDINGS_MODEL = OpenAIEmbeddings()
-FAISS_INDEX_PATH = "faiss_index"
+# FAISS_INDEX_PATH = "faiss_index"  # Removed since we're using pgvector
 
 
 # Helper to verify Firebase ID token
@@ -154,40 +157,7 @@ def verify_firebase_token(token: str):
 # -------------------- OpenAI Setup --------------------
 # Get embedding from OpenAI
 # Generate Embeddings When Storing Interactions
-'''
-embedding_dim = 1536  # For OpenAI's text-embedding-3-small or ada-002
-
-# Function to get OpenAI embedding
-
-def get_embedding(text: str) -> list[float]:
-    response = openai.embeddings.create(
-        input=text,
-        model="text-embedding-3-small"
-    )
-    return response.data[0].embedding
-
-# Async function to load all embeddings from the DB and build a FAISS index
-async def load_faiss_index(async_session_maker):
-    async with async_session_maker() as session:
-        result = await session.execute(select(Interaction.id, Interaction.embedding))
-        rows = result.all()
-        if not rows:
-            index = faiss.IndexFlatL2(embedding_dim)
-            return index, []
-        ids = [row[0] for row in rows]
-        embeddings = np.array([row[1] for row in rows], dtype='float32')
-        index = faiss.IndexFlatL2(embedding_dim)
-        if len(embeddings) > 0:
-            index.add(embeddings)
-        return index, ids
-
-# Function to search the FAISS index for similar interactions
-def search_faiss_index(index, ids, query_text, k=5):
-    query_embedding = np.array([get_embedding(query_text)], dtype='float32')
-    D, I = index.search(query_embedding, k)
-    relevant_ids = [ids[i] for i in I[0] if i < len(ids)]
-    return relevant_ids
-'''
+# Note: We use pgvector for vector search instead of FAISS
 
 # -------------------- FastAPI App --------------------
 # FastAPI app
@@ -544,6 +514,12 @@ class UserUpdate(fausers_schemas.BaseUserUpdate):
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     reset_password_token_secret = SecretStr(SECRET_KEY or "")
     verification_token_secret = SecretStr(SECRET_KEY or "")
+    
+    # Override the password helper to use bcrypt only
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from pwdlib.hashers.bcrypt import BcryptHasher
+        self.password_helper = PasswordHelper(BcryptHasher())
 
     async def on_after_register(self, user: User, request=None):
         logger.info(f"User {user.email} has registered.")
@@ -1133,41 +1109,7 @@ async def delete_child_profile(child_id: int, user: User = Depends(current_activ
     return {"status": "deleted"}
 
 
-'''
-# Global variables to cache the index and ids
-faiss_index = None
-faiss_ids = None
-
-
-@app.on_event("startup")
-async def startup_event():
-    global faiss_index, faiss_ids
-    faiss_index, faiss_ids = await load_faiss_index(AsyncSessionLocal)
-
-
-@app.get("/search-memory")
-async def search_memory(query: str = Query(...)):
-    global faiss_index, faiss_ids
-    if faiss_index is None or faiss_ids is None:
-        # (Re)load if not loaded
-        faiss_index, faiss_ids = await load_faiss_index(AsyncSessionLocal)
-    relevant_ids = search_faiss_index(faiss_index, faiss_ids, query, k=5)
-    # Fetch the actual interactions from the DB
-    async with AsyncSessionLocal() as session:
-        result = await session.execute(
-            select(Interaction).where(Interaction.id.in_(relevant_ids))
-        )
-        interactions = result.scalars().all()
-    return [
-        {
-            "id": i.id,
-            "query": i.query,
-            "response": i.response,
-            "created_at": i.created_at
-        }
-        for i in interactions
-    ]
-'''
+# Note: FAISS search endpoint removed - we use pgvector for vector search
 
 @app.post("/api/chat")
 async def chat(
