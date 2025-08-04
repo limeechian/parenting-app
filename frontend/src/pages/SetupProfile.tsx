@@ -42,7 +42,8 @@ import {
 //const API_BASE_URL = 'http://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
 //const API_BASE_URL = 'https://2fayughxfh.execute-api.ap-southeast-2.amazonaws.com/prod';
 // const API_BASE_URL = 'http://localhost:8000'; // For local development
-const API_BASE_URL = 'https://parenzing.com'; // For production
+// const API_BASE_URL = 'https://parenzing.com'; // For production
+const API_BASE_URL = 'https://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
 
 const defaultParentProfile = {
   full_name: '',
