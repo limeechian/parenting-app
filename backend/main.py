@@ -177,52 +177,36 @@ app.add_middleware(
 
 # Add explicit OPTIONS handler for all routes
 #@app.options("/{full_path:path}")
-# Add explicit OPTIONS handler for API routes only (not root or health endpoints)
-@app.options("/api/{full_path:path}")
-#async def options_handler(full_path: str):
-async def options_handler(full_path: str, request: Request):
-    from fastapi.responses import Response
-    response = Response(content="OK", status_code=200)
-    # Allow multiple origins
-    origin = request.headers.get("origin", "http://localhost:3000")
-    allowed_origins = [
-        "http://localhost:3000",
-        "https://master.dcmcchu8q16tm.amplifyapp.com",
-        "https://dcmcchu8q16tm.amplifyapp.com"
-    ]
-    if origin in allowed_origins:
-        response.headers["Access-Control-Allow-Origin"] = origin
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
-    response.headers["Access-Control-Allow-Credentials"] = "true"
-    response.headers["Access-Control-Max-Age"] = "86400"
-    return response
-
-# Add explicit OPTIONS handler for auth endpoints
-@app.options("/auth/{full_path:path}")
-async def auth_options_handler(full_path: str, request: Request):
-    from fastapi.responses import Response
-    response = Response(content="OK", status_code=200)
-    # Allow multiple origins
-    origin = request.headers.get("origin", "http://localhost:3000")
-    allowed_origins = [
-        "http://localhost:3000",
-        "https://master.dcmcchu8q16tm.amplifyapp.com",
-        "https://dcmcchu8q16tm.amplifyapp.com"
-    ]
-    if origin in allowed_origins:
-        response.headers["Access-Control-Allow-Origin"] = origin
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
-    response.headers["Access-Control-Allow-Credentials"] = "true"
-    response.headers["Access-Control-Max-Age"] = "86400"
-    return response
+# CORS is now handled by the middleware above
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     print(f"Request: {request.method} {request.url}")
     print(f"Cookies: {request.cookies}")
     response = await call_next(request)
+    return response
+
+@app.middleware("http")
+async def add_cors_headers(request: Request, call_next):
+    response = await call_next(request)
+    
+    # Get the origin from the request
+    origin = request.headers.get("origin")
+    
+    # Define allowed origins
+    allowed_origins = [
+        "http://localhost:3000",
+        "https://master.dcmcchu8q16tm.amplifyapp.com",
+        "https://dcmcchu8q16tm.amplifyapp.com"
+    ]
+    
+    # Add CORS headers if origin is allowed
+    if origin in allowed_origins:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept"
+    
     return response
 
 '''
