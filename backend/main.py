@@ -185,8 +185,15 @@ app.add_middleware(
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     print(f"Request: {request.method} {request.url}")
+    print(f"Headers: {dict(request.headers)}")
     print(f"Cookies: {request.cookies}")
+    print(f"Query params: {dict(request.query_params)}")
+    
     response = await call_next(request)
+    
+    print(f"Response status: {response.status_code}")
+    print(f"Response headers: {dict(response.headers)}")
+    
     return response
 
 @app.middleware("http")
@@ -721,7 +728,46 @@ async def health_check():
 
 @app.get("/test")
 async def test_endpoint():
-    return {"message": "Backend is working!"}
+    return {"message": "Backend is running"}
+
+@app.get("/test-db")
+async def test_database_connection(db: AsyncSession = Depends(get_session)):
+    try:
+        # Test database connection
+        result = await db.execute(text("SELECT 1 as test"))
+        db_test = result.scalar()
+        
+        # Test if users table exists and has data
+        result = await db.execute(text("SELECT COUNT(*) FROM users"))
+        user_count = result.scalar()
+        
+        return {
+            "database_connection": "success",
+            "db_test": db_test,
+            "user_count": user_count,
+            "message": "Database is accessible"
+        }
+    except Exception as e:
+        print(f"Database test error: {e}")
+        return {
+            "database_connection": "failed",
+            "error": str(e),
+            "message": "Database connection failed"
+        }
+
+@app.get("/test-auth")
+async def test_auth_status(request: Request):
+    """Test authentication status without requiring authentication"""
+    cookies = request.cookies
+    headers = dict(request.headers)
+    
+    return {
+        "cookies": cookies,
+        "authorization_header": headers.get("authorization"),
+        "content_type": headers.get("content-type"),
+        "origin": headers.get("origin"),
+        "message": "Auth test endpoint"
+    }
 
 @app.get("/api/test-cors")
 async def test_cors_endpoint():

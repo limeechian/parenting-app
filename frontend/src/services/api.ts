@@ -8,6 +8,8 @@ const API_BASE_URL = 'https://parenzing.com';
 //const API_BASE_URL = 'https://2fayughxfh.execute-api.ap-southeast-2.amazonaws.com/prod';
 //const API_BASE_URL = 'http://3.26.204.206:8000';
 
+console.log('API_BASE_URL configured as:', API_BASE_URL);
+
 // Common fetch options to handle mixed content and CORS
 const getFetchOptions = (method: string, body?: any, additionalHeaders?: Record<string, string>) => {
   const options: RequestInit = {
@@ -29,11 +31,24 @@ const getFetchOptions = (method: string, body?: any, additionalHeaders?: Record<
 
 // Helper function to handle mixed content issues
 const makeRequest = async (url: string, options: RequestInit) => {
+  console.log('Making request to:', url);
+  console.log('Request options:', options);
+  
   try {
     // Try the normal request first
     const response = await fetch(url, options);
+    console.log('Response status:', response.status);
+    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+    
+    if (!response.ok) {
+      console.error('Request failed with status:', response.status);
+      const errorText = await response.text();
+      console.error('Error response body:', errorText);
+    }
+    
     return response;
   } catch (error) {
+    console.error('Request error:', error);
     console.warn('Mixed content error, trying alternative approach:', error);
     // If mixed content error, we could implement a fallback here
     throw error;
