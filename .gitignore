@@ -91,8 +91,8 @@ env_template.txt
 frontend/.env
 frontend/env-template.txt
 
-# Firebase configuration with real API keys
-frontend/src/firebase.js
+# Firebase configuration with real API keys (now using environment variables)
+# frontend/src/firebase.js
 frontend/src/firebase.config.js
 
 # Any files with real API keys or passwords

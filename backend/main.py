@@ -167,7 +167,10 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",  # React dev server
         "https://master.dcmcchu8q16tm.amplifyapp.com",  # Production frontend
-        "https://dcmcchu8q16tm.amplifyapp.com"  # Alternative frontend URL
+        "https://dcmcchu8q16tm.amplifyapp.com",  # Alternative frontend URL
+        "https://parenzing.com",  # Custom domain
+        "http://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com",  # Backend domain (HTTP)
+        "https://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com"  # Backend domain (HTTPS)
     ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -197,7 +200,10 @@ async def add_cors_headers(request: Request, call_next):
     allowed_origins = [
         "http://localhost:3000",
         "https://master.dcmcchu8q16tm.amplifyapp.com",
-        "https://dcmcchu8q16tm.amplifyapp.com"
+        "https://dcmcchu8q16tm.amplifyapp.com",
+        "https://parenzing.com",
+        "http://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com",
+        "https://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com"
     ]
     
     # Add CORS headers if origin is allowed

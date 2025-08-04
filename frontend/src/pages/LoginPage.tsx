@@ -11,7 +11,8 @@ import { Heart, Shield, Sparkles, ArrowRight } from 'lucide-react';
 //const API_BASE_URL = 'http://localhost:8000';
 // const API_BASE_URL = 'http://localhost:8000'; // For local development
 // const API_BASE_URL = 'https://parenzing.com'; // For production
-const API_BASE_URL = 'https://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
+//const API_BASE_URL = 'https://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
+const API_BASE_URL = 'https://parenzing.com';
 
 
 const LoginPage: React.FC = () => {

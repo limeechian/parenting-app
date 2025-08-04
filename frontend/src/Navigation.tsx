@@ -37,7 +37,8 @@ const Navigation: React.FC = () => {
     // Only fetch user profile if we're on a protected route
     const protectedRoutes = ['/parent-dashboard', '/ai-chat', '/profile'];
     if (protectedRoutes.some(route => location.pathname.startsWith(route))) {
-      fetch('https://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com/profile/parent', { credentials: 'include' })
+      //fetch('https://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com/profile/parent', { credentials: 'include' })
+      fetch('https://parenzing.com/profile/parent', { credentials: 'include' })
         .then(res => res.json())
         .then(data => {
           setUser({
