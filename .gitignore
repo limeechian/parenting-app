@@ -73,3 +73,32 @@ check_*.py
 fix_*.py
 *.sql
 test_*.js
+
+# SECURITY: Sensitive files that should NEVER be in Git
+# AWS Configuration Files
+backend/task-definition.json
+backend/service-definition.json
+backend/task-policy.json
+backend/trust-policy.json
+backend/deploy-ecs.bat
+backend/setup-iam-roles.bat
+
+# Environment files with real credentials
+backend/.env
+backend/env-aws.txt
+backend/env-aws-template.txt
+env_template.txt
+frontend/.env
+frontend/env-template.txt
+
+# Firebase configuration with real API keys
+frontend/src/firebase.js
+frontend/src/firebase.config.js
+
+# Any files with real API keys or passwords
+**/secrets.json
+**/credentials.json
+**/config.json
+**/*.key
+**/*.pem
+**/*.p12

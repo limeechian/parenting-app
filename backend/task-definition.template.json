@@ -1,0 +1,58 @@
+{
+  "family": "parenting-app-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::YOUR_ACCOUNT_ID:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::YOUR_ACCOUNT_ID:role/ecsTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "parenting-app-backend",
+      "image": "YOUR_ACCOUNT_ID.dkr.ecr.YOUR_REGION.amazonaws.com/parenting-app-backend:latest",
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "DATABASE_URL",
+          "value": "postgresql+asyncpg://YOUR_DB_USERNAME:YOUR_DB_PASSWORD@YOUR_RDS_ENDPOINT:5432/YOUR_DB_NAME"
+        },
+        {
+          "name": "SECRET_KEY",
+          "value": "YOUR_SECRET_KEY_HERE"
+        },
+        {
+          "name": "OPENAI_API_KEY",
+          "value": "YOUR_OPENAI_API_KEY_HERE"
+        },
+        {
+          "name": "FIREBASE_CLIENT_ID",
+          "value": "YOUR_FIREBASE_CLIENT_ID"
+        },
+        {
+          "name": "FIREBASE_PROJECT_ID",
+          "value": "YOUR_FIREBASE_PROJECT_ID"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/parenting-app-backend",
+          "awslogs-region": "YOUR_AWS_REGION",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      }
+    }
+  ]
+} 
