@@ -94,16 +94,20 @@ const LoginPage: React.FC = () => {
 
   // Google sign-in handler (assumes Firebase is set up)
   const handleGoogleSignIn = async () => {
+    console.log('Google sign-in started'); // Debug log
     setError('');
     setLoading(true);
     try {
+      console.log('Calling signInWithGoogle...'); // Debug log
       const result = await signInWithGoogle();
+      console.log('Google sign-in successful, getting ID token...'); // Debug log
       const idToken = await result.user.getIdToken();
 
       localStorage.setItem('userEmail', result.user.email || '');
+      console.log('Making request to /auth/google...'); // Debug log
 
       // Send the token to your backend for authentication/registration
-              const response = await fetch(`${API_BASE_URL}/auth/google`, {
+      const response = await fetch(`${API_BASE_URL}/auth/google`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -113,7 +117,10 @@ const LoginPage: React.FC = () => {
         credentials: "include",
       });
 
+      console.log('Response status:', response.status); // Debug log
       const data = await response.json();
+      console.log('Response data:', data); // Debug log
+      
       if (!response.ok) {
         setError(data.detail || "Google sign-in failed");
         setLoading(false);
@@ -125,6 +132,7 @@ const LoginPage: React.FC = () => {
         navigate("/parent-dashboard");
       }
     } catch (error) {
+      console.error('Google sign-in error:', error); // Debug log
       setError("Google sign-in failed");
     } finally {
       setLoading(false);
@@ -278,6 +286,7 @@ const LoginPage: React.FC = () => {
             </div>
 
             <Button
+              type="button"
               variant="outlined"
               fullWidth
               onClick={handleGoogleSignIn}
