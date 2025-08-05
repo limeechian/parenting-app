@@ -697,8 +697,10 @@ async def google_auth(request: Request, db: AsyncSession = Depends(get_session))
         expires=cookie_transport.cookie_max_age,
         path="/",
         httponly=True,
-        samesite="lax",  # "lax" for local dev, "none" for HTTPS
-        secure=False,    # True if using HTTPS
+        samesite="none",  # "none" for cross-origin HTTPS
+        secure=True,      # True for HTTPS
+        #samesite="lax",  # "lax" for local dev, "none" for HTTPS
+        #secure=False,    # True if using HTTPS
         # domain is omitted
     )
 
@@ -995,7 +997,8 @@ async def custom_login(
     
     # Debug password verification
     print(f"Attempting password verification...")
-    valid, _ = user_manager.password_helper.verify_and_update(
+    #valid, _ = user_manager.password_helper.verify_and_update(
+    valid = user_manager.password_helper.verify(
         credentials.password, user.hashed_password
     )
     print(f"Password verification result: {valid}")
@@ -1019,7 +1022,7 @@ async def custom_login(
             parent_profile.relationship_status,
             parent_profile.parenting_style,
         ]
-    profile_complete = all(f not in (None, "") for f in required_fields)
+        profile_complete = all(f not in (None, "") for f in required_fields)
 
     response_content = {"access_token": token, "token_type": "bearer", "profileComplete": profile_complete}
     response = Response(content=json.dumps(response_content), media_type="application/json")
@@ -1038,8 +1041,8 @@ async def custom_login(
         expires=cookie_transport.cookie_max_age,
         path="/",
         httponly=True,
-        samesite="lax",  # "lax" for local dev, "none" for HTTPS
-        secure=False,    # True if using HTTPS
+        samesite="none",  # "none" for cross-origin HTTPS
+        secure=True,      # True for HTTPS
         # domain is omitted
     )
 
