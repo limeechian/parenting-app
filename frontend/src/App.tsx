@@ -17,9 +17,13 @@ const AppRoutes = () => {
   const location = useLocation();
   // Hide nav on login/signup/setup-profile
   const hideNav = ['/login', '/signup', '/setup-profile'].includes(location.pathname);
+  
+  // Check if user is authenticated (has a cookie)
+  const isAuthenticated = document.cookie.includes('fastapi-users');
+  
   return (
     <>
-      {!hideNav && <Navigation />}
+      {!hideNav && isAuthenticated && <Navigation />}
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
