@@ -174,7 +174,7 @@ app.add_middleware(
     ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+    allow_headers=["Content-Type", "Authorization", "X-Requested-With", "Accept", "Accept-Language", "Accept-Encoding", "Referer"],
     expose_headers=["*"]
 )
 
@@ -196,6 +196,7 @@ async def log_requests(request: Request, call_next):
     
     return response
 
+'''
 @app.middleware("http")
 async def add_cors_headers(request: Request, call_next):
     response = await call_next(request)
@@ -218,9 +219,11 @@ async def add_cors_headers(request: Request, call_next):
         response.headers["Access-Control-Allow-Origin"] = origin
         response.headers["Access-Control-Allow-Credentials"] = "true"
         response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Accept-Language, Accept-Encoding, Referer"
     
     return response
+'''
+# Removed conflicting custom CORS middleware - using FastAPI's built-in CORSMiddleware only
 
 '''
 @app.middleware("http")
@@ -995,14 +998,21 @@ async def custom_login(
         print(f"User {user.email} has no password (likely a Google user)")
         raise HTTPException(status_code=400, detail="This account was created with Google sign-in. Please use Google sign-in to log in.")
     
-    # Debug password verification
+        # Debug password verification
     print(f"Attempting password verification...")
-    #valid, _ = user_manager.password_helper.verify_and_update(
-    valid = user_manager.password_helper.verify(
-        credentials.password, user.hashed_password
-    )
-    print(f"Password verification result: {valid}")
-    
+    # Use the correct method for password verification with BcryptHasher
+    try:
+        # For BcryptHasher, we need to use verify method directly
+        valid = user_manager.password_helper.verify(
+            credentials.password, user.hashed_password
+        )
+        print(f"Password verification result: {valid}")
+    except Exception as e:
+        print(f"Password verification error: {e}")
+        print(f"PasswordHelper type: {type(user_manager.password_helper)}")
+        print(f"PasswordHelper methods: {dir(user_manager.password_helper)}")
+        raise
+
     if not valid:
         print(f"Password verification failed")
         raise HTTPException(status_code=400, detail=ErrorCode.LOGIN_BAD_CREDENTIALS)
