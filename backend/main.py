@@ -558,8 +558,10 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     # Override the password helper to use bcrypt only
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        from pwdlib.hashers.bcrypt import BcryptHasher
-        self.password_helper = PasswordHelper(BcryptHasher())
+        from passlib.context import CryptContext
+        # Use passlib's CryptContext with bcrypt
+        pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+        self.password_helper = PasswordHelper(pwd_context)
 
     async def on_after_register(self, user: User, request=None):
         logger.info(f"User {user.email} has registered.")
@@ -1000,9 +1002,9 @@ async def custom_login(
     
         # Debug password verification
     print(f"Attempting password verification...")
-    # Use the correct method for password verification with BcryptHasher
+    # Use the correct method for password verification with passlib
     try:
-        # For BcryptHasher, we need to use verify method directly
+        # Use verify method for passlib CryptContext
         valid = user_manager.password_helper.verify(
             credentials.password, user.hashed_password
         )
