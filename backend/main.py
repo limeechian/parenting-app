@@ -166,15 +166,17 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",  # React dev server
+        "http://localhost:8080",  # Local test server
         "https://master.dcmcchu8q16tm.amplifyapp.com",  # Production frontend
         "https://dcmcchu8q16tm.amplifyapp.com",  # Alternative frontend URL
         "https://parenzing.com",  # Custom domain
+        "http://parenzing.com",  # Custom domain (HTTP)
         "http://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com",  # Backend domain (HTTP)
         "https://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com"  # Backend domain (HTTPS)
     ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization", "X-Requested-With", "Accept", "Accept-Language", "Accept-Encoding", "Referer"],
+    allow_headers=["Content-Type", "Authorization", "X-Requested-With", "Accept", "Accept-Language", "Accept-Encoding", "Referer", "Origin"],
     expose_headers=["*"]
 )
 
@@ -668,17 +670,8 @@ async def google_auth(request: Request, db: AsyncSession = Depends(get_session))
         profile_complete = all(f not in (None, "") for f in required_fields)
 
     # Issue JWT cookie (same as /auth/jwt/login)
-    get_strategy_result = auth_backend.get_strategy()
-    if inspect.isgenerator(get_strategy_result):
-        strategy = next(get_strategy_result)
-    elif inspect.iscoroutine(get_strategy_result):
-        strategy = await get_strategy_result
-    elif inspect.isasyncgen(get_strategy_result):
-        strategy = await get_strategy_result.__anext__()
-    else:
-        strategy = get_strategy_result
-
-    token = await strategy.write_token(user)  # type: ignore
+    strategy = get_jwt_strategy()
+    token = await strategy.write_token(user)
     logger.info(f"JWT token: {token}")
     response_content = {"profileComplete": profile_complete, "id": user.id}
     response = Response(content=json.dumps(response_content), media_type="application/json")
@@ -696,16 +689,14 @@ async def google_auth(request: Request, db: AsyncSession = Depends(get_session))
         return None
 
     response.set_cookie(
-        key=cookie_transport.cookie_name,
+        key="fastapi-users-auth-jwt",
         value=token,
-        max_age=cookie_transport.cookie_max_age,
-        expires=cookie_transport.cookie_max_age,
+        max_age=3600,
+        expires=3600,
         path="/",
         httponly=True,
         samesite="none",  # "none" for cross-origin HTTPS
         secure=True,      # True for HTTPS
-        #samesite="lax",  # "lax" for local dev, "none" for HTTPS
-        #secure=False,    # True if using HTTPS
         # domain is omitted
     )
 
@@ -728,6 +719,43 @@ async def google_auth(request: Request, db: AsyncSession = Depends(get_session))
 @app.get("/")
 async def root():
     return {"message": "Parenting App Backend API", "status": "running"}
+
+@app.get("/sitemap.xml")
+async def sitemap():
+    """Return a basic sitemap for SEO"""
+    return Response(
+        content="""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>https://parenzing.com/</loc>
+        <lastmod>2025-01-06</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+    </url>
+</urlset>""",
+        media_type="application/xml"
+    )
+
+@app.get("/robots.txt")
+async def robots():
+    """Return robots.txt for SEO"""
+    return Response(
+        content="""User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /auth/
+Disallow: /profile/
+Sitemap: https://parenzing.com/sitemap.xml""",
+        media_type="text/plain"
+    )
+
+@app.get("/favicon.ico")
+async def favicon():
+    """Return a simple favicon response"""
+    return Response(
+        content="",  # Empty favicon
+        media_type="image/x-icon"
+    )
 
 @app.get("/health")
 async def health_check():
@@ -957,9 +985,6 @@ async def custom_login(
     credentials: OAuth2PasswordRequestForm = Depends(),
     db: AsyncSession = Depends(get_session),
     user_manager: BaseUserManager[User, int] = Depends(get_user_manager),
-    auth_backend: AuthenticationBackend = Depends(lambda: auth_backend),
-    cookie_transport: CookieTransport = Depends(lambda: cookie_transport),
-    strategy: Strategy = Depends(lambda: auth_backend.get_strategy()),
 ):
     # Debug logging
     print(f"Login attempt - username: {credentials.username}")
@@ -1004,8 +1029,8 @@ async def custom_login(
     print(f"Attempting password verification...")
     # Use the correct method for password verification with passlib
     try:
-        # Use verify method for passlib CryptContext
-        valid = user_manager.password_helper.verify(
+        # Use verify_and_update method for PasswordHelper
+        valid, _ = user_manager.password_helper.verify_and_update(
             credentials.password, user.hashed_password
         )
         print(f"Password verification result: {valid}")
@@ -1019,6 +1044,7 @@ async def custom_login(
         print(f"Password verification failed")
         raise HTTPException(status_code=400, detail=ErrorCode.LOGIN_BAD_CREDENTIALS)
 
+    strategy = get_jwt_strategy()
     token = await strategy.write_token(user)
 
     # Check profile completion (parent profile)
@@ -1047,10 +1073,10 @@ async def custom_login(
         return val_lower if val_lower in allowed else "lax"
 
     response.set_cookie(
-        key=cookie_transport.cookie_name,
+        key="fastapi-users-auth-jwt",
         value=token,
-        max_age=cookie_transport.cookie_max_age,
-        expires=cookie_transport.cookie_max_age,
+        max_age=3600,
+        expires=3600,
         path="/",
         httponly=True,
         samesite="none",  # "none" for cross-origin HTTPS

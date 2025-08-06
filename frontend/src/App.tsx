@@ -19,7 +19,7 @@ const AppRoutes = () => {
   const hideNav = ['/login', '/signup', '/setup-profile'].includes(location.pathname);
   
   // Check if user is authenticated (has a cookie)
-  const isAuthenticated = document.cookie.includes('fastapi-users');
+  const isAuthenticated = document.cookie.includes('fastapi-users-auth-jwt');
   
   return (
     <>
