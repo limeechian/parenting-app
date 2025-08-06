@@ -55,9 +55,9 @@ const makeRequest = async (url: string, options: RequestInit) => {
   }
 };
 
-export const sendLogin = async (input: { email: string; password: string }) => {
+export const sendLogin = async (input: { identifier: string; password: string }) => {
   const formData = new URLSearchParams();
-  formData.append('username', input.email);
+  formData.append('username', input.identifier); // Backend expects 'username' field but accepts username OR email
   formData.append('password', input.password);
   //const res = await fetch(`${API_BASE_URL}/auth/jwt/login`, {
   const res = await makeRequest(`${API_BASE_URL}/auth/jwt/login`, {
