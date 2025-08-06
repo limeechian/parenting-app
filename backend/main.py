@@ -700,6 +700,10 @@ async def google_auth(request: Request, db: AsyncSession = Depends(get_session))
         # domain is omitted
     )
 
+    # Ensure CORS headers are set for manual response
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Expose-Headers"] = "*"
+
     return response
 
 '''
@@ -1083,6 +1087,10 @@ async def custom_login(
         secure=True,      # True for HTTPS
         # domain is omitted
     )
+
+    # Ensure CORS headers are set for manual response
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Expose-Headers"] = "*"
 
     return response
 
