@@ -1068,6 +1068,7 @@ async def custom_login(
 
     response_content = {"access_token": token, "token_type": "bearer", "profileComplete": profile_complete}
     response = Response(content=json.dumps(response_content), media_type="application/json")
+    response.headers["Access-Control-Allow-Origin"] = "https://master.dcmcchu8q16tm.amplifyapp.com"
 
     def get_samesite(val):
         allowed = {"lax", "strict", "none"}
