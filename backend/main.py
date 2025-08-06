@@ -219,7 +219,8 @@ async def add_cors_headers(request: Request, call_next):
     # Add CORS headers if origin is allowed
     if origin in allowed_origins:
         response.headers["Access-Control-Allow-Origin"] = origin
-        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Access-Control-Allow-Origin"] = "https://master.dcmcchu8q16tm.amplifyapp.com"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
         response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
         response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Accept-Language, Accept-Encoding, Referer"
     
@@ -701,6 +702,7 @@ async def google_auth(request: Request, db: AsyncSession = Depends(get_session))
     )
 
     # Ensure CORS headers are set for manual response
+    response.headers["Access-Control-Allow-Origin"] = "https://master.dcmcchu8q16tm.amplifyapp.com"
     response.headers["Access-Control-Allow-Credentials"] = "true"
     response.headers["Access-Control-Expose-Headers"] = "*"
 
@@ -1040,9 +1042,14 @@ async def custom_login(
         print(f"Password verification result: {valid}")
     except Exception as e:
         print(f"Password verification error: {e}")
-        print(f"PasswordHelper type: {type(user_manager.password_helper)}")
-        print(f"PasswordHelper methods: {dir(user_manager.password_helper)}")
-        raise
+        # If password hash is corrupted/unknown, treat as invalid password
+        if "UnknownHashError" in str(e) or "hash could not be identified" in str(e):
+            print(f"Invalid password hash detected for user {user.email}, treating as bad credentials")
+            valid = False
+        else:
+            print(f"PasswordHelper type: {type(user_manager.password_helper)}")
+            print(f"PasswordHelper methods: {dir(user_manager.password_helper)}")
+            raise
 
     if not valid:
         print(f"Password verification failed")
@@ -1090,6 +1097,7 @@ async def custom_login(
     )
 
     # Ensure CORS headers are set for manual response
+    response.headers["Access-Control-Allow-Origin"] = "https://master.dcmcchu8q16tm.amplifyapp.com"
     response.headers["Access-Control-Allow-Credentials"] = "true"
     response.headers["Access-Control-Expose-Headers"] = "*"
 

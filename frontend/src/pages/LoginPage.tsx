@@ -21,8 +21,8 @@ const LoginPage: React.FC = () => {
     setError('');
     setLoading(true);
     try {
-             // Use the API service for login
-       const loginResult = await sendLogin({ identifier: identifier, password });
+      // Use the API service for login
+      await sendLogin({ identifier: identifier, password });
       
       // Store user identifier for profile setup
       localStorage.setItem('userEmail', identifier);

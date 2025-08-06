@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
 import Navigation from './Navigation';
@@ -15,11 +15,37 @@ import './firebase';
 
 const AppRoutes = () => {
   const location = useLocation();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
+  
   // Hide nav on login/signup/setup-profile
   const hideNav = ['/login', '/signup', '/setup-profile'].includes(location.pathname);
   
-  // Check if user is authenticated (has a cookie)
-  const isAuthenticated = document.cookie.includes('fastapi-users-auth-jwt');
+  // Check authentication status by making an API call
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('https://parenzing.com/profile/parent', {
+          method: 'GET',
+          credentials: 'include',
+          mode: 'cors'
+        });
+        setIsAuthenticated(response.ok);
+      } catch (error) {
+        console.log('Auth check failed:', error);
+        setIsAuthenticated(false);
+      } finally {
+        setAuthChecked(true);
+      }
+    };
+
+    checkAuth();
+  }, [location.pathname]); // Re-check when location changes
+  
+  // Show loading while checking auth
+  if (!authChecked) {
+    return <div>Loading...</div>;
+  }
   
   return (
     <>
