@@ -606,7 +606,12 @@ async def google_auth(request: Request, db: AsyncSession = Depends(get_session))
     # Check if user exists
     #result = await db.execute(User.__table__.select().where(User.email == email))
     #user_row = result.fetchone()
-    result = await db.execute(select(User).where(User.email == email))
+    #result = await db.execute(select(User).where(User.email == email))
+    
+    # Check if user exists by email or google_id
+    result = await db.execute(select(User).where(
+        or_(User.email == email, User.google_id == sub)
+    ))
     user_row = result.scalar_one_or_none()
     user = None
 

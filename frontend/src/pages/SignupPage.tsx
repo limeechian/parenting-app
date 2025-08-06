@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Checkbox, FormControlLabel, InputAdornment, IconButton, CircularProgress, Radio, RadioGroup, FormControl } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { signInWithGoogle } from '../firebase';
-import { Users, Shield, Sparkles, ArrowRight, Heart, Star } from 'lucide-react';
+import { Users, Shield, ArrowRight, Heart, Star } from 'lucide-react';
 
 //const API_BASE_URL = 'http://localhost:8000';
 //const API_BASE_URL = 'https://5e0em7cm60.execute-api.ap-southeast-2.amazonaws.com/prod';
@@ -12,7 +12,9 @@ import { Users, Shield, Sparkles, ArrowRight, Heart, Star } from 'lucide-react';
 // const API_BASE_URL = 'http://localhost:8000'; // For local development
 // const API_BASE_URL = 'https://parenzing.com'; // For production
 //const API_BASE_URL = 'https://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
-const API_BASE_URL = 'https://parenzing.com';
+//const API_BASE_URL = 'https://parenzing.com';
+import { API_BASE_URL } from '../config/api';
+import { sendSignup, googleSignIn } from '../services/api';
 
 const SignupPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -51,19 +53,12 @@ const SignupPage: React.FC = () => {
     setError('');
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, username, role }),
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        setError(data.detail || 'Signup failed');
-        setLoading(false);
-        return;
-      }
+      // Use centralized API service
+      await sendSignup({ email, password, username, role });
+      
       // Store user email for profile setup
       localStorage.setItem('userEmail', email);
+      
       // Auto-login after successful registration
       const loginRes = await fetch(`${API_BASE_URL}/auth/jwt/login`, {
         method: 'POST',
@@ -80,7 +75,8 @@ const SignupPage: React.FC = () => {
         setError('Signup succeeded, but auto-login failed. Please log in manually.');
       }
     } catch (err: any) {
-      setError('Signup failed');
+      console.error('Signup error:', err);
+      setError(err.message || 'Signup failed');
     } finally {
       setLoading(false);
     }
@@ -96,30 +92,17 @@ const SignupPage: React.FC = () => {
   
       localStorage.setItem('userEmail', result.user.email || '');
   
-      // Send the token to your backend for authentication/registration
-      const response = await fetch(`${API_BASE_URL}/auth/google`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${idToken}`,
-        },
-        body: JSON.stringify({ email: result.user.email }),
-        credentials: "include",
-      });
-  
-      const data = await response.json();
-      if (!response.ok) {
-        setError(data.detail || "Google sign-in failed");
-        setLoading(false);
-        return;
-      }
+      // Use centralized API service
+      const data = await googleSignIn(idToken, result.user.email || '');
+      
       if (!data.profileComplete) {
         navigate("/setup-profile");
       } else {
         navigate("/parent-dashboard");
       }
-    } catch (error) {
-      setError("Google sign-in failed");
+    } catch (error: any) {
+      console.error('Google sign-in error:', error);
+      setError(error.message || "Google sign-in failed");
     } finally {
       setLoading(false);
     }

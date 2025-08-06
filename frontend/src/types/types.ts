@@ -2,6 +2,7 @@ export interface UserInput {
   email: string;
   password: string;
   username: string;
+  role?: string;
 }
 
 export interface ChatInput {

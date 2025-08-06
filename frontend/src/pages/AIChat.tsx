@@ -5,6 +5,15 @@ import {
   Plus, ChevronDown, ChevronRight, Trash2, Edit3, Search, X, Shield, Users, Settings, MessageSquare, Menu, X as CloseIcon
 } from 'lucide-react';
 
+
+//const API_BASE_URL = 'http://localhost:8000'; // For local development
+// const API_BASE_URL = 'https://parenzing.com'; // For production
+//const API_BASE_URL = 'http://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
+//const API_BASE_URL = 'https://2fayughxfh.execute-api.ap-southeast-2.amazonaws.com/prod';
+//const API_BASE_URL = 'https://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
+//const API_BASE_URL = 'https://parenzing.com';
+import { API_BASE_URL } from '../config/api';
+
 interface Message {
   id: string;
   content: string;
@@ -58,14 +67,8 @@ interface ConfirmationDialog {
   cancelText: string;
   onConfirm: () => void;
   onCancel: () => void;
-}
+  }
 
-//const API_BASE_URL = 'http://localhost:8000'; // For local development
-// const API_BASE_URL = 'https://parenzing.com'; // For production
-//const API_BASE_URL = 'http://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
-//const API_BASE_URL = 'https://2fayughxfh.execute-api.ap-southeast-2.amazonaws.com/prod';
-//const API_BASE_URL = 'https://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
-const API_BASE_URL = 'https://parenzing.com';
 const AIChat: React.FC = () => {
   const navigate = useNavigate();
   

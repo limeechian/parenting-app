@@ -1,14 +1,17 @@
 // API service for new endpoints using fetch
-import { UserInput, ChatInput } from '../types/types';
+
+//import { UserInput, ChatInput } from '../types/types';
 
 //const API_BASE_URL = 'https://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
-const API_BASE_URL = 'https://parenzing.com';
-// const API_BASE_URL = 'https://parenzing.com'; // For production
-// const API_BASE_URL = 'https://5e0em7cm60.execute-api.ap-southeast-2.amazonaws.com/prod';
+//const API_BASE_URL = 'https://parenzing.com';
+//const API_BASE_URL = 'https://parenzing.com'; // For production
+//const API_BASE_URL = 'https://5e0em7cm60.execute-api.ap-southeast-2.amazonaws.com/prod';
 //const API_BASE_URL = 'https://2fayughxfh.execute-api.ap-southeast-2.amazonaws.com/prod';
 //const API_BASE_URL = 'http://3.26.204.206:8000';
 
-console.log('API_BASE_URL configured as:', API_BASE_URL);
+//console.log('API_BASE_URL configured as:', API_BASE_URL);
+import { UserInput } from '../types/types';
+import { API_BASE_URL } from '../config/api';
 
 // Common fetch options to handle mixed content and CORS
 const getFetchOptions = (method: string, body?: any, additionalHeaders?: Record<string, string>) => {

@@ -38,13 +38,15 @@ import {
   Shield
 } from 'lucide-react';
 
+
 //const API_BASE_URL = 'http://localhost:8000';
 //const API_BASE_URL = 'http://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
 //const API_BASE_URL = 'https://2fayughxfh.execute-api.ap-southeast-2.amazonaws.com/prod';
 // const API_BASE_URL = 'http://localhost:8000'; // For local development
 // const API_BASE_URL = 'https://parenzing.com'; // For production
 //const API_BASE_URL = 'https://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
-const API_BASE_URL = 'https://parenzing.com';
+//const API_BASE_URL = 'https://parenzing.com';
+import { API_BASE_URL } from '../config/api';
 
 const defaultParentProfile = {
   full_name: '',
@@ -146,8 +148,7 @@ const SetupProfile: React.FC = () => {
     setLoading(true);
     setError('');
     try {
-      //const res = await fetch(`${API_BASE_URL}/profile/parent`, {
-              const res = await fetch(`${API_BASE_URL}/profile/parent`, {
+      const res = await fetch(`${API_BASE_URL}/profile/parent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
