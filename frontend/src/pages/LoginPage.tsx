@@ -4,15 +4,7 @@ import { TextField, Button, Checkbox, FormControlLabel, InputAdornment, IconButt
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { signInWithGoogle } from '../firebase';
 import { Heart, Shield, Sparkles, ArrowRight } from 'lucide-react';
-
-//const API_BASE_URL = 'https://5e0em7cm60.execute-api.ap-southeast-2.amazonaws.com/prod';
-//const API_BASE_URL = 'http://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
-//const API_BASE_URL = 'https://2fayughxfh.execute-api.ap-southeast-2.amazonaws.com/prod';
-//const API_BASE_URL = 'http://localhost:8000';
-// const API_BASE_URL = 'http://localhost:8000'; // For local development
-// const API_BASE_URL = 'https://parenzing.com'; // For production
-//const API_BASE_URL = 'https://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
-const API_BASE_URL = 'https://parenzing.com';
+import { sendLogin, getParentProfile, googleSignIn } from '../services/api';
 
 
 const LoginPage: React.FC = () => {
@@ -29,36 +21,15 @@ const LoginPage: React.FC = () => {
     setError('');
     setLoading(true);
     try {
-      const formData = new URLSearchParams();
-      formData.append('username', identifier);
-      formData.append('password', password);
-      const res = await fetch(`${API_BASE_URL}/auth/jwt/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: formData.toString(),
-        credentials: 'include',
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        // Handle specific error for Google users
-        if (data.detail && data.detail.includes("Google sign-in")) {
-          setError("This account was created with Google sign-in. Please use the 'Sign in with Google' button below.");
-        } else {
-          setError(data.detail || 'Login failed');
-        }
-        setLoading(false);
-        return;
-      }
+      // Use the API service for login
+      const loginResult = await sendLogin({ email: identifier, password });
+      
       // Store user identifier for profile setup
       localStorage.setItem('userEmail', identifier);
   
-      // Fetch parent profile to check completion
-      //const profileRes = await fetch(`${API_BASE_URL}/profile/parent`, {
-      const profileRes = await fetch(`${API_BASE_URL}/profile/parent`, {
-        credentials: 'include',
-      });
-      if (profileRes.ok) {
-        const profile = await profileRes.json();
+      // Fetch parent profile to check completion using API service
+      try {
+        const profile = await getParentProfile();
         // Check if important fields are filled
         const requiredFields = [
           'full_name',
@@ -81,12 +52,17 @@ const LoginPage: React.FC = () => {
         } else {
           navigate('/setup-profile');
         }
-      } else {
+      } catch (profileErr) {
         // If profile not found, treat as incomplete
         navigate('/setup-profile');
       }
     } catch (err: any) {
-      setError('Login failed');
+      console.error('Login error:', err);
+      if (err.message && err.message.includes("Google sign-in")) {
+        setError("This account was created with Google sign-in. Please use the 'Sign in with Google' button below.");
+      } else {
+        setError(err.message || 'Login failed');
+      }
     } finally {
       setLoading(false);
     }
@@ -107,25 +83,9 @@ const LoginPage: React.FC = () => {
       console.log('Making request to /auth/google...'); // Debug log
 
       // Send the token to your backend for authentication/registration
-      const response = await fetch(`${API_BASE_URL}/auth/google`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${idToken}`,
-        },
-        body: JSON.stringify({ email: result.user.email }),
-        credentials: "include",
-      });
-
-      console.log('Response status:', response.status); // Debug log
-      const data = await response.json();
-      console.log('Response data:', data); // Debug log
+      const data = await googleSignIn(idToken, result.user.email || '');
       
-      if (!response.ok) {
-        setError(data.detail || "Google sign-in failed");
-        setLoading(false);
-        return;
-      }
+      console.log('Response data:', data); // Debug log
       if (!data.profileComplete) {
         navigate("/setup-profile");
       } else {
