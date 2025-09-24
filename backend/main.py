@@ -993,6 +993,7 @@ async def get_me(user: User = Depends(current_active_user)):
 
 @app.post("/auth/jwt/login")
 async def custom_login(
+    request: Request,
     credentials: OAuth2PasswordRequestForm = Depends(),
     db: AsyncSession = Depends(get_session),
     user_manager: BaseUserManager[User, int] = Depends(get_user_manager),
@@ -1080,7 +1081,22 @@ async def custom_login(
 
     response_content = {"access_token": token, "token_type": "bearer", "profileComplete": profile_complete}
     response = Response(content=json.dumps(response_content), media_type="application/json")
-    response.headers["Access-Control-Allow-Origin"] = "https://master.dcmcchu8q16tm.amplifyapp.com"
+    
+    # Get origin from request headers for dynamic CORS
+    origin = request.headers.get("origin")
+    allowed_origins = [
+        "http://localhost:3000",  # React dev server
+        "http://localhost:8080",  # Local test server
+        "https://master.dcmcchu8q16tm.amplifyapp.com",  # Production frontend
+        "https://dcmcchu8q16tm.amplifyapp.com",  # Alternative frontend URL
+        "https://parenzing.com",  # Custom domain (not used for frontend currently)
+        "http://parenzing.com",  # Custom domain (HTTP)
+    ]
+    
+    if origin in allowed_origins:
+        response.headers["Access-Control-Allow-Origin"] = origin
+    else:
+        response.headers["Access-Control-Allow-Origin"] = "https://master.dcmcchu8q16tm.amplifyapp.com"
 
     def get_samesite(val):
         allowed = {"lax", "strict", "none"}

@@ -1,5 +1,5 @@
 # Database Configuration
-DATABASE_URL=postgresql://username:password@your-rds-endpoint:5432/parenting_app
+DATABASE_URL=postgresql://postgres:[YOUR-SUPABASE-PASSWORD]@db.oqilidmqmeluvnruahne.supabase.co:5432/postgres
 
 # Security
 SECRET_KEY=your-secret-key-here

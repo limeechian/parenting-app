@@ -13,8 +13,8 @@ import { Users, Shield, ArrowRight, Heart, Star } from 'lucide-react';
 // const API_BASE_URL = 'https://parenzing.com'; // For production
 //const API_BASE_URL = 'https://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
 //const API_BASE_URL = 'https://parenzing.com';
-import { API_BASE_URL } from '../config/api';
-import { sendSignup, googleSignIn } from '../services/api';
+//import { API_BASE_URL } from '../config/api';
+import { sendSignup, googleSignIn, sendLogin } from '../services/api';
 
 const SignupPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -59,19 +59,13 @@ const SignupPage: React.FC = () => {
       // Store user email for profile setup
       localStorage.setItem('userEmail', email);
       
-      // Auto-login after successful registration
-      const loginRes = await fetch(`${API_BASE_URL}/auth/jwt/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          username: email,
-          password: password,
-        }).toString(),
-        credentials: 'include',
-      });
-      if (loginRes.ok) {
+      // Auto-login after successful registration using centralized API service
+      try {
+        const loginData = await sendLogin({ identifier: email, password: password });
+        console.log('Auto-login successful:', loginData);
         navigate('/setup-profile');
-      } else {
+      } catch (loginErr) {
+        console.error('Auto-login failed:', loginErr);
         setError('Signup succeeded, but auto-login failed. Please log in manually.');
       }
     } catch (err: any) {
