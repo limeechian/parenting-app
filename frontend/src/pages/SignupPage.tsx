@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { TextField, Button, Checkbox, FormControlLabel, InputAdornment, IconButton, CircularProgress, Radio, RadioGroup, FormControl } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { signInWithGoogle } from '../firebase';
@@ -421,12 +421,12 @@ const SignupPage: React.FC = () => {
             <div className="text-center pt-4">
               <p className="text-[#6B8CAE]">
                 Already have an account?{' '}
-                <a 
-                  href="/login" 
+                <Link 
+                  to="/login" 
                   className="text-[#722F37] hover:text-[#8B4513] font-semibold transition-colors"
                 >
                   Sign In
-                </a>
+                </Link>
               </p>
             </div>
           </form>
