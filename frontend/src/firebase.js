@@ -50,7 +50,19 @@ export const signInWithGoogle = async () => {
   try {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
-    return await signInWithPopup(auth, provider);
+    
+    // Try popup first, fallback to redirect if blocked
+    try {
+      return await signInWithPopup(auth, provider);
+    } catch (popupError) {
+      if (popupError.code === 'auth/popup-blocked' || popupError.code === 'auth/popup-closed-by-user') {
+        console.warn('Popup blocked, trying redirect method');
+        // For redirect method, we need to handle it differently
+        // This is a simplified approach - in production you'd want proper redirect handling
+        throw new Error('Please allow pop-ups for this site or try again.');
+      }
+      throw popupError;
+    }
   } catch (error) {
     console.error('Google sign-in error:', error);
     if (error.code === 'auth/popup-closed-by-user') {

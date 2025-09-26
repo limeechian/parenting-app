@@ -81,13 +81,20 @@ const SignupPage: React.FC = () => {
     setError('');
     setLoading(true);
     try {
+      console.log('Starting Google sign-in...');
       const result = await signInWithGoogle();
+      console.log('Firebase sign-in successful:', result.user.email);
+      
       const idToken = await result.user.getIdToken();
+      console.log('Firebase token obtained, length:', idToken.length);
+      console.log('Token preview:', idToken.substring(0, 50) + '...');
   
       localStorage.setItem('userEmail', result.user.email || '');
   
+      console.log('Calling backend API...');
       // Use centralized API service
       const data = await googleSignIn(idToken, result.user.email || '');
+      console.log('Backend response:', data);
       
       if (!data.profileComplete) {
         navigate("/setup-profile");
