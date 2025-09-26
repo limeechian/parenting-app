@@ -1,6 +1,6 @@
 // Centralized API configuration
 //export const API_BASE_URL = 'https://parenzing.com';
-export const API_BASE_URL = 'https://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
+export const API_BASE_URL = 'http://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
 
 
 export const API_ENDPOINTS = {
