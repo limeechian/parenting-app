@@ -53,6 +53,7 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/signup/" element={<Navigate to="/signup" replace />} />
         <Route path="/setup-profile" element={<SetupProfile />} />
         <Route path="/parent-dashboard" element={<ParentDashboard />} />
         <Route path="/ai-chat" element={<AIChat />} />
