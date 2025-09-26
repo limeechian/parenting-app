@@ -19,7 +19,7 @@
       "environment": [
         {
           "name": "DATABASE_URL",
-          "value": "postgresql+asyncpg://postgres:parenting-app-database@db.oqilidmqmeluvnruahne.supabase.co:5432/postgres"
+          "value": "postgresql+asyncpg://postgres.oqilidmqmeluvnruahne:parenting-app-database@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres"
         },
         {
           "name": "SECRET_KEY",

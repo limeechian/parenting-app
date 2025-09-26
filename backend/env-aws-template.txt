@@ -1,5 +1,5 @@
 # Database Configuration
-DATABASE_URL=postgresql://postgres:[YOUR-SUPABASE-PASSWORD]@db.oqilidmqmeluvnruahne.supabase.co:5432/postgres
+DATABASE_URL=postgresql://postgres.oqilidmqmeluvnruahne:[YOUR-SUPABASE-PASSWORD]@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres
 
 # Security
 SECRET_KEY=your-secret-key-here
