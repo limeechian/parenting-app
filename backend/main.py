@@ -181,8 +181,18 @@ app.add_middleware(
 )
 
 # Add explicit OPTIONS handler for all routes
-#@app.options("/{full_path:path}")
-# CORS is now handled by the middleware above
+@app.options("/{full_path:path}")
+async def options_handler(request: Request):
+    return Response(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": request.headers.get("origin", "*"),
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With, Accept, Accept-Language, Accept-Encoding, Referer, Origin",
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Max-Age": "86400"
+        }
+    )
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
@@ -195,6 +205,46 @@ async def log_requests(request: Request, call_next):
     
     print(f"Response status: {response.status_code}")
     print(f"Response headers: {dict(response.headers)}")
+    
+    return response
+
+@app.middleware("http")
+async def add_cors_headers(request: Request, call_next):
+    # Handle preflight requests
+    if request.method == "OPTIONS":
+        return Response(
+            status_code=200,
+            headers={
+                "Access-Control-Allow-Origin": request.headers.get("origin", "*"),
+                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With, Accept, Accept-Language, Accept-Encoding, Referer, Origin",
+                "Access-Control-Allow-Credentials": "true",
+                "Access-Control-Max-Age": "86400"
+            }
+        )
+    
+    response = await call_next(request)
+    
+    # Add CORS headers to all responses
+    origin = request.headers.get("origin")
+    allowed_origins = [
+        "http://localhost:3000",
+        "http://localhost:8080", 
+        "https://master.dcmcchu8q16tm.amplifyapp.com",
+        "https://dcmcchu8q16tm.amplifyapp.com",
+        "https://parenzing.com",
+        "http://parenzing.com"
+    ]
+    
+    if origin in allowed_origins:
+        response.headers["Access-Control-Allow-Origin"] = origin
+    else:
+        response.headers["Access-Control-Allow-Origin"] = "https://master.dcmcchu8q16tm.amplifyapp.com"
+    
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Accept-Language, Accept-Encoding, Referer, Origin"
+    response.headers["Access-Control-Expose-Headers"] = "*"
     
     return response
 
