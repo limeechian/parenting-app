@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { TextField, Button, Checkbox, FormControlLabel, InputAdornment, IconButton, CircularProgress, Radio, RadioGroup, FormControl } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { signInWithGoogle } from '../firebase';
+import { signInWithGoogle, handleRedirectResult } from '../firebase';
 import { Users, Shield, ArrowRight, Heart, Star } from 'lucide-react';
 
 //const API_BASE_URL = 'http://localhost:8000';
@@ -27,6 +27,35 @@ const SignupPage: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Handle redirect result on component mount (for mobile Safari)
+  React.useEffect(() => {
+    const handleRedirect = async () => {
+      try {
+        const result = await handleRedirectResult();
+        if (result) {
+          console.log('Redirect result received:', result);
+          setLoading(true); // Set loading state for redirect
+          const idToken = await result.user.getIdToken();
+          localStorage.setItem('userEmail', result.user.email || '');
+          
+          const data = await googleSignIn(idToken, result.user.email || '');
+          
+          if (!data.profileComplete) {
+            navigate("/setup-profile");
+          } else {
+            navigate("/parent-dashboard");
+          }
+        }
+      } catch (error) {
+        console.error('Redirect handling error:', error);
+        setError('Google sign-in failed');
+        setLoading(false);
+      }
+    };
+    
+    handleRedirect();
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,6 +112,13 @@ const SignupPage: React.FC = () => {
     try {
       console.log('Starting Google sign-in...');
       const result = await signInWithGoogle();
+      
+      // Check if result is null (redirect method for mobile Safari)
+      if (!result) {
+        console.log('Redirect method used, result will be handled by useEffect');
+        return; // Exit early, redirect result will be handled by useEffect
+      }
+      
       console.log('Firebase sign-in successful:', result.user.email);
       
       const idToken = await result.user.getIdToken();

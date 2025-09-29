@@ -248,44 +248,7 @@ async def add_cors_headers(request: Request, call_next):
     
     return response
 
-'''
-@app.middleware("http")
-async def add_cors_headers(request: Request, call_next):
-    response = await call_next(request)
-    
-    # Get the origin from the request
-    origin = request.headers.get("origin")
-    
-    # Define allowed origins
-    allowed_origins = [
-        "http://localhost:3000",
-        "https://master.dcmcchu8q16tm.amplifyapp.com",
-        "https://dcmcchu8q16tm.amplifyapp.com",
-        "https://parenzing.com",
-        "http://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com",
-        "https://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com"
-    ]
-    
-    # Add CORS headers if origin is allowed
-    if origin in allowed_origins:
-        response.headers["Access-Control-Allow-Origin"] = origin
-        response.headers["Access-Control-Allow-Origin"] = "https://master.dcmcchu8q16tm.amplifyapp.com"
-    response.headers["Access-Control-Allow-Credentials"] = "true"
-        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Accept-Language, Accept-Encoding, Referer"
-    
-    return response
-'''
-# Removed conflicting custom CORS middleware - using FastAPI's built-in CORSMiddleware only
 
-'''
-@app.middleware("http")
-async def add_coop_coep_headers(request, call_next):
-    response = await call_next(request)
-    response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
-    response.headers["Cross-Origin-Embedder-Policy"] = "require-corp"
-    return response
-'''
 
 # -------------------- Database Setup --------------------
 # Use async engine/session for FastAPI Users

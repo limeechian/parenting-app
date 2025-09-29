@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { TextField, Button, Checkbox, FormControlLabel, InputAdornment, IconButton, CircularProgress } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { signInWithGoogle } from '../firebase';
+import { signInWithGoogle, handleRedirectResult } from '../firebase';
 import { Heart, Shield, Sparkles, ArrowRight } from 'lucide-react';
 import { sendLogin, getParentProfile, googleSignIn } from '../services/api';
 
@@ -15,6 +15,35 @@ const LoginPage: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Handle redirect result on component mount (for mobile Safari)
+  React.useEffect(() => {
+    const handleRedirect = async () => {
+      try {
+        const result = await handleRedirectResult();
+        if (result) {
+          console.log('Redirect result received:', result);
+          setLoading(true); // Set loading state for redirect
+          const idToken = await result.user.getIdToken();
+          localStorage.setItem('userEmail', result.user.email || '');
+          
+          const data = await googleSignIn(idToken, result.user.email || '');
+          
+          if (!data.profileComplete) {
+            navigate("/setup-profile");
+          } else {
+            navigate("/parent-dashboard");
+          }
+        }
+      } catch (error) {
+        console.error('Redirect handling error:', error);
+        setError('Google sign-in failed');
+        setLoading(false);
+      }
+    };
+    
+    handleRedirect();
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,6 +105,13 @@ const LoginPage: React.FC = () => {
     try {
       console.log('Calling signInWithGoogle...'); // Debug log
       const result = await signInWithGoogle();
+      
+      // Check if result is null (redirect method for mobile Safari)
+      if (!result) {
+        console.log('Redirect method used, result will be handled by useEffect');
+        return; // Exit early, redirect result will be handled by useEffect
+      }
+      
       console.log('Google sign-in successful, getting ID token...'); // Debug log
       const idToken = await result.user.getIdToken();
 
@@ -107,7 +143,7 @@ const LoginPage: React.FC = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#9CAF88] to-[#8B4513] rounded-2xl mb-4 shadow-lg">
             <Heart className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-[#8B4513] mb-2 font-['Inter']">Welcome Back</h1>
+          <h1 className="text-3xl font-bold text-[#8B4513] mb-2" style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>Welcome Back</h1>
           <p className="text-[#6B8CAE] text-lg">Continue your parenting journey with us</p>
         </div>
 
