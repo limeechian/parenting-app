@@ -717,7 +717,7 @@ async def google_auth(request: Request, db: AsyncSession = Depends(get_session))
         httponly=True,
         samesite="none",  # "none" for cross-origin HTTPS
         secure=True,      # True for HTTPS
-        # domain omitted for cross-origin compatibility
+        domain=None,      # Explicitly set to None for cross-origin compatibility
     )
 
     # Ensure CORS headers are set for manual response (dynamic by origin)
@@ -852,6 +852,19 @@ async def debug_google_auth(request: Request):
         "headers": headers,
         "message": "Google auth debug endpoint",
         "timestamp": datetime.now().isoformat()
+    }
+
+@app.get("/test-cookie")
+async def test_cookie(request: Request):
+    """Test if cookies are being sent correctly"""
+    cookies = request.cookies
+    auth_cookie = cookies.get("fastapi-users-auth-jwt")
+    
+    return {
+        "cookies_received": cookies,
+        "auth_cookie_present": auth_cookie is not None,
+        "auth_cookie_value": auth_cookie[:50] + "..." if auth_cookie else None,
+        "message": "Cookie test endpoint"
     }
 
 @app.get("/api/test-cors")
@@ -1153,7 +1166,7 @@ async def custom_login(
         httponly=True,
         samesite="none",  # "none" for cross-origin HTTPS
         secure=True,      # True for HTTPS
-        # domain omitted for cross-origin compatibility
+        domain=None,      # Explicitly set to None for cross-origin compatibility
     )
 
     # Ensure CORS headers are set for manual response (dynamic by origin)
