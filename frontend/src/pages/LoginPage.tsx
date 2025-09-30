@@ -41,7 +41,39 @@ const LoginPage: React.FC = () => {
           }
         } else {
           console.log('No redirect result found - user needs to click Google button');
-          // Don't auto-authenticate existing users - let them click the button
+          // Check if we're coming back from a Google redirect (URL might have parameters)
+          const urlParams = new URLSearchParams(window.location.search);
+          if (urlParams.has('code') || urlParams.has('state') || window.location.hash.includes('access_token')) {
+            console.log('Detected Google redirect parameters, but no Firebase result');
+            setError('Google sign-in completed but authentication failed. Please try again.');
+          }
+          
+          // Also check if Firebase user is already authenticated
+          const { auth } = await import('../firebase');
+          if (auth.currentUser) {
+            console.log('Firebase user already authenticated, processing...');
+            setLoading(true);
+            try {
+              const idToken = await auth.currentUser.getIdToken();
+              localStorage.setItem('userEmail', auth.currentUser.email || '');
+              
+              console.log('Calling googleSignIn with existing token...');
+              const data = await googleSignIn(idToken, auth.currentUser.email || '');
+              console.log('Google sign-in response:', data);
+              
+              if (!data.profileComplete) {
+                console.log('Profile incomplete, navigating to setup-profile');
+                navigate("/setup-profile");
+              } else {
+                console.log('Profile complete, navigating to dashboard');
+                navigate("/parent-dashboard");
+              }
+            } catch (error) {
+              console.error('Error processing existing Firebase user:', error);
+              setError('Authentication failed. Please try again.');
+              setLoading(false);
+            }
+          }
         }
       } catch (error) {
         console.error('Redirect handling error:', error);
