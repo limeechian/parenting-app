@@ -65,13 +65,17 @@ const AppRoutes = () => {
   
   // Show loading while checking auth for protected routes
   if (isProtectedRoute && !authChecked) {
+    console.log('Loading auth check for protected route:', location.pathname);
     return <div>Loading...</div>;
   }
   
   // Redirect to login if accessing protected route without authentication
   if (isProtectedRoute && authChecked && !isAuthenticated) {
+    console.log('Redirecting to login - isProtectedRoute:', isProtectedRoute, 'authChecked:', authChecked, 'isAuthenticated:', isAuthenticated);
     return <Navigate to="/login" replace />;
   }
+  
+  console.log('Rendering routes - isProtectedRoute:', isProtectedRoute, 'authChecked:', authChecked, 'isAuthenticated:', isAuthenticated, 'location:', location.pathname);
   
   return (
     <>
