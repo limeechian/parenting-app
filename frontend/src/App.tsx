@@ -56,10 +56,10 @@ const AppRoutes = () => {
 
       checkAuth();
     } else {
-      // For non-protected routes, don't check auth
+      // For non-protected routes, don't check auth but don't reset authentication state
       console.log('Non-protected route, skipping auth check:', location.pathname);
       setAuthChecked(true);
-      setIsAuthenticated(false);
+      // Don't reset isAuthenticated for non-protected routes
     }
   }, [location.pathname, isProtectedRoute]);
   
