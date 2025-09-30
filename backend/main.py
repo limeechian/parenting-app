@@ -719,8 +719,17 @@ async def google_auth(request: Request, db: AsyncSession = Depends(get_session))
         # domain is omitted
     )
 
-    # Ensure CORS headers are set for manual response
-    response.headers["Access-Control-Allow-Origin"] = "https://master.dcmcchu8q16tm.amplifyapp.com"
+    # Ensure CORS headers are set for manual response (dynamic by origin)
+    origin = request.headers.get("origin")
+    allowed_origins = [
+        "http://localhost:3000",
+        "http://localhost:8080",
+        "https://master.dcmcchu8q16tm.amplifyapp.com",
+        "https://dcmcchu8q16tm.amplifyapp.com",
+        "https://parenzing.com",
+        "http://parenzing.com",
+    ]
+    response.headers["Access-Control-Allow-Origin"] = origin if origin in allowed_origins else "https://parenzing.com"
     response.headers["Access-Control-Allow-Credentials"] = "true"
     response.headers["Access-Control-Expose-Headers"] = "*"
 
@@ -1130,8 +1139,17 @@ async def custom_login(
         # domain is omitted
     )
 
-    # Ensure CORS headers are set for manual response
-    response.headers["Access-Control-Allow-Origin"] = "https://master.dcmcchu8q16tm.amplifyapp.com"
+    # Ensure CORS headers are set for manual response (dynamic by origin)
+    origin = request.headers.get("origin")
+    allowed_origins = [
+        "http://localhost:3000",  # React dev server
+        "http://localhost:8080",  # Local test server
+        "https://master.dcmcchu8q16tm.amplifyapp.com",  # Production frontend
+        "https://dcmcchu8q16tm.amplifyapp.com",  # Alternative frontend URL
+        "https://parenzing.com",  # Custom domain
+        "http://parenzing.com",  # Custom domain (HTTP)
+    ]
+    response.headers["Access-Control-Allow-Origin"] = origin if origin in allowed_origins else "https://parenzing.com"
     response.headers["Access-Control-Allow-Credentials"] = "true"
     response.headers["Access-Control-Expose-Headers"] = "*"
 
