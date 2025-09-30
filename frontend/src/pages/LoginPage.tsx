@@ -7,7 +7,12 @@ import { Heart, Shield, Sparkles, ArrowRight } from 'lucide-react';
 import { sendLogin, getParentProfile, googleSignIn } from '../services/api';
 
 
-const LoginPage: React.FC = () => {
+interface LoginPageProps {
+  //onGoogleSignIn?: () => void;
+  onSuccessfulSignIn?: () => void;
+}
+
+const LoginPage: React.FC<LoginPageProps> = ({ onSuccessfulSignIn }) => {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -50,6 +55,10 @@ const LoginPage: React.FC = () => {
             (field !== 'age' || profile[field] > 0)
         );
         if (isComplete) {
+          // Notify App.tsx that we just signed in successfully
+          if (onSuccessfulSignIn) {
+            onSuccessfulSignIn();
+          }
           navigate('/parent-dashboard');
         } else {
           navigate('/setup-profile');
@@ -94,6 +103,10 @@ const LoginPage: React.FC = () => {
         navigate("/setup-profile");
       } else {
         console.log('Profile complete, navigating to dashboard');
+        // Notify App.tsx that we just signed in successfully
+        if (onSuccessfulSignIn) {
+          onSuccessfulSignIn();
+        }
         navigate("/parent-dashboard");
       }
     } catch (error) {

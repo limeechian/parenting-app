@@ -17,6 +17,7 @@ const AppRoutes = () => {
   const location = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
+  const [justSignedIn, setJustSignedIn] = useState(false);
   
   // Hide nav on login/signup/setup-profile
   const hideNav = ['/login', '/signup', '/setup-profile'].includes(location.pathname);
@@ -28,6 +29,15 @@ const AppRoutes = () => {
   // Only check authentication for protected routes
   useEffect(() => {
     if (isProtectedRoute) {
+      // If we just signed in, trust that authentication and skip the check
+      if (justSignedIn) {
+        console.log('Just signed in, skipping auth check and setting authenticated to true');
+        setIsAuthenticated(true);
+        setAuthChecked(true);
+        setJustSignedIn(false); // Reset the flag
+        return;
+      }
+
       const checkAuth = async () => {
         try {
           console.log('Checking authentication for protected route:', location.pathname);
@@ -63,7 +73,7 @@ const AppRoutes = () => {
       setAuthChecked(true);
       // Don't reset isAuthenticated for non-protected routes
     }
-  }, [location.pathname, isProtectedRoute]);
+  }, [location.pathname, isProtectedRoute, justSignedIn]);
   
   // Show loading while checking auth for protected routes
   if (isProtectedRoute && !authChecked) {
@@ -83,7 +93,7 @@ const AppRoutes = () => {
     <>
       {!hideNav && isAuthenticated && <Navigation />}
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login" element={<LoginPage onSuccessfulSignIn={() => setJustSignedIn(true)} />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/setup-profile" element={<SetupProfile />} />
         <Route path="/parent-dashboard" element={<ParentDashboard />} />
