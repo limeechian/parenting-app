@@ -40,27 +40,8 @@ const LoginPage: React.FC = () => {
             navigate("/parent-dashboard");
           }
         } else {
-          console.log('No redirect result found');
-          // Check if user is already authenticated
-          const { auth } = await import('../firebase');
-          if (auth.currentUser) {
-            console.log('User already authenticated, getting token...');
-            setLoading(true);
-            const idToken = await auth.currentUser.getIdToken();
-            localStorage.setItem('userEmail', auth.currentUser.email || '');
-            
-            console.log('Calling googleSignIn with existing token...');
-            const data = await googleSignIn(idToken, auth.currentUser.email || '');
-            console.log('Google sign-in response:', data);
-            
-            if (!data.profileComplete) {
-              console.log('Profile incomplete, navigating to setup-profile');
-              navigate("/setup-profile");
-            } else {
-              console.log('Profile complete, navigating to dashboard');
-              navigate("/parent-dashboard");
-            }
-          }
+          console.log('No redirect result found - user needs to click Google button');
+          // Don't auto-authenticate existing users - let them click the button
         }
       } catch (error) {
         console.error('Redirect handling error:', error);
@@ -126,7 +107,7 @@ const LoginPage: React.FC = () => {
 
   // Google sign-in handler (assumes Firebase is set up)
   const handleGoogleSignIn = async () => {
-    console.log('Google sign-in started'); // Debug log
+    console.log('Google sign-in button clicked'); // Debug log
     setError('');
     setLoading(true);
     try {
