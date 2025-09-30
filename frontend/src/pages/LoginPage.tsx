@@ -41,6 +41,26 @@ const LoginPage: React.FC = () => {
           }
         } else {
           console.log('No redirect result found');
+          // Check if user is already authenticated
+          const { auth } = await import('../firebase');
+          if (auth.currentUser) {
+            console.log('User already authenticated, getting token...');
+            setLoading(true);
+            const idToken = await auth.currentUser.getIdToken();
+            localStorage.setItem('userEmail', auth.currentUser.email || '');
+            
+            console.log('Calling googleSignIn with existing token...');
+            const data = await googleSignIn(idToken, auth.currentUser.email || '');
+            console.log('Google sign-in response:', data);
+            
+            if (!data.profileComplete) {
+              console.log('Profile incomplete, navigating to setup-profile');
+              navigate("/setup-profile");
+            } else {
+              console.log('Profile complete, navigating to dashboard');
+              navigate("/parent-dashboard");
+            }
+          }
         }
       } catch (error) {
         console.error('Redirect handling error:', error);

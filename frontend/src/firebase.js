@@ -93,7 +93,9 @@ export const signInWithGoogle = async () => {
 // Handle redirect result (for mobile Safari)
 export const handleRedirectResult = async () => {
   try {
+    console.log('Checking for redirect result...');
     const result = await getRedirectResult(auth);
+    console.log('Redirect result:', result);
     return result;
   } catch (error) {
     console.error('Redirect result error:', error);

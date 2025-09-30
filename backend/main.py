@@ -838,6 +838,22 @@ async def test_auth_status(request: Request):
         "message": "Auth test endpoint"
     }
 
+@app.get("/debug-google-auth")
+async def debug_google_auth(request: Request):
+    """Debug endpoint to test Google authentication flow"""
+    cookies = request.cookies
+    headers = dict(request.headers)
+    
+    logger.info(f"Debug Google Auth - Cookies: {cookies}")
+    logger.info(f"Debug Google Auth - Headers: {headers}")
+    
+    return {
+        "cookies": cookies,
+        "headers": headers,
+        "message": "Google auth debug endpoint",
+        "timestamp": datetime.now().isoformat()
+    }
+
 @app.get("/api/test-cors")
 async def test_cors_endpoint():
     return {"message": "CORS is working!", "timestamp": datetime.now().isoformat()}
