@@ -1217,13 +1217,39 @@ async def custom_login(
 
 # -------------------- Parent Profile Endpoints --------------------
 @app.get("/profile/parent")
-async def get_parent_profile(user: User = Depends(current_active_user), db: AsyncSession = Depends(get_session)):
+async def get_parent_profile(request: Request, user: User = Depends(current_active_user), db: AsyncSession = Depends(get_session)):
     print(f"Getting parent profile for user {user.id} ({user.email})")
     result = await db.execute(select(ParentProfile).where(ParentProfile.id == user.id))
     profile = result.scalar_one_or_none()
     if not profile:
         raise HTTPException(status_code=404, detail="Parent profile not found")
-    return profile.__dict__
+    
+    # Add explicit CORS headers
+    response_data = profile.__dict__
+    response = Response(content=json.dumps(response_data), media_type="application/json")
+    
+    # Set CORS headers dynamically based on origin
+    origin = request.headers.get("origin")
+    allowed_origins = [
+        "http://localhost:3000",
+        "http://localhost:8080",
+        "https://master.dcmcchu8q16tm.amplifyapp.com",
+        "https://dcmcchu8q16tm.amplifyapp.com",
+        "https://parenzing.com",
+        "http://parenzing.com"
+    ]
+    
+    if origin in allowed_origins:
+        response.headers["Access-Control-Allow-Origin"] = origin
+    else:
+        response.headers["Access-Control-Allow-Origin"] = "https://master.dcmcchu8q16tm.amplifyapp.com"
+    
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Accept-Language, Accept-Encoding, Referer, Origin"
+    response.headers["Access-Control-Expose-Headers"] = "*"
+    
+    return response
 
 @app.post("/profile/parent")
 async def create_or_update_parent_profile(
