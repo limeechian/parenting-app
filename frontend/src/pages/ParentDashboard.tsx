@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getParentProfile, getChildren } from '../services/api';
 import { CircularProgress, Card, CardContent, Typography, Grid } from '@mui/material';
 
@@ -7,6 +8,7 @@ const ParentDashboard: React.FC = () => {
   const [children, setChildren] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -17,13 +19,20 @@ const ParentDashboard: React.FC = () => {
         const childrenData = await getChildren();
         setChildren(childrenData);
       } catch (e: any) {
+        console.error('Dashboard fetch error:', e);
+        // If authentication fails, redirect to login
+        if (e.message && (e.message.includes('401') || e.message.includes('Unauthorized'))) {
+          console.log('Authentication failed, redirecting to login');
+          navigate('/login');
+          return;
+        }
         setError('Failed to load dashboard');
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, []);
+  }, [navigate]);
 
   if (loading) return <div className="flex justify-center items-center min-h-screen"><CircularProgress /></div>;
   if (error) return <div className="text-red-600 text-center mt-8">{error}</div>;

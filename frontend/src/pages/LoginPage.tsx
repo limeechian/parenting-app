@@ -138,10 +138,10 @@ const LoginPage: React.FC = () => {
         navigate("/setup-profile");
       } else {
         console.log('Profile complete, navigating to dashboard');
-        // Add a small delay to ensure cookies are set
+        // Add a longer delay to ensure cookies are set
         setTimeout(() => {
           navigate("/parent-dashboard");
-        }, 100);
+        }, 500);
       }
     } catch (error) {
       console.error('Google sign-in error:', error); // Debug log
