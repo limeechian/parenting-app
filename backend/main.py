@@ -692,6 +692,7 @@ async def google_auth(request: Request, db: AsyncSession = Depends(get_session))
     strategy = get_jwt_strategy()
     token = await strategy.write_token(user)
     logger.info(f"JWT token: {token}")
+    logger.info(f"Setting cookie for origin: {request.headers.get('origin')}")
     response_content = {"profileComplete": profile_complete, "id": user.id}
     response = Response(content=json.dumps(response_content), media_type="application/json")
 
@@ -716,7 +717,7 @@ async def google_auth(request: Request, db: AsyncSession = Depends(get_session))
         httponly=True,
         samesite="none",  # "none" for cross-origin HTTPS
         secure=True,      # True for HTTPS
-        # domain is omitted
+        domain=".parenzing.com"  # Set domain for cross-origin cookie sharing
     )
 
     # Ensure CORS headers are set for manual response (dynamic by origin)
@@ -1136,7 +1137,7 @@ async def custom_login(
         httponly=True,
         samesite="none",  # "none" for cross-origin HTTPS
         secure=True,      # True for HTTPS
-        # domain is omitted
+        domain=".parenzing.com"  # Set domain for cross-origin cookie sharing
     )
 
     # Ensure CORS headers are set for manual response (dynamic by origin)
