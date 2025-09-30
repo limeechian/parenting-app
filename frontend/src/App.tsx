@@ -34,7 +34,14 @@ const AppRoutes = () => {
         console.log('Just signed in, skipping auth check and setting authenticated to true');
         setIsAuthenticated(true);
         setAuthChecked(true);
-        setJustSignedIn(false); // Reset the flag
+        // Don't reset the flag immediately - let it persist for this navigation
+        setTimeout(() => setJustSignedIn(false), 1000); // Reset after 1 second
+        return;
+      }
+
+      // If we're already authenticated, don't run the check again
+      if (isAuthenticated && authChecked) {
+        console.log('Already authenticated, skipping auth check');
         return;
       }
 
@@ -73,7 +80,7 @@ const AppRoutes = () => {
       setAuthChecked(true);
       // Don't reset isAuthenticated for non-protected routes
     }
-  }, [location.pathname, isProtectedRoute, justSignedIn]);
+  }, [location.pathname, isProtectedRoute, justSignedIn, isAuthenticated, authChecked]);
   
   // Show loading while checking auth for protected routes
   if (isProtectedRoute && !authChecked) {
