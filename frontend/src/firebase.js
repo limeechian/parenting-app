@@ -1,6 +1,6 @@
 // Firebase configuration using environment variables
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 // Check if Firebase environment variables are set
 const requiredEnvVars = [
@@ -46,36 +46,13 @@ provider.setCustomParameters({
   prompt: "select_account", // Forces account chooser on sign-in
 });
 
-// Detect if we're on mobile Safari
-const isMobileSafari = () => {
-  const ua = navigator.userAgent;
-  return /iPad|iPhone|iPod/.test(ua) && /Safari/.test(ua) && !/Chrome|CriOS|FxiOS/.test(ua);
-};
-
 export const signInWithGoogle = async () => {
   try {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
     
-    // Use redirect for mobile Safari, popup for others
-    if (isMobileSafari()) {
-      console.log('Mobile Safari detected, using redirect method');
-      await signInWithRedirect(auth, provider);
-      // The redirect will handle the rest, this function won't return
-      return null;
-    } else {
-      // Try popup for desktop and other browsers
-      try {
-        return await signInWithPopup(auth, provider);
-      } catch (popupError) {
-        if (popupError.code === 'auth/popup-blocked' || popupError.code === 'auth/popup-closed-by-user') {
-          console.warn('Popup blocked, trying redirect method');
-          await signInWithRedirect(auth, provider);
-          return null;
-        }
-        throw popupError;
-      }
-    }
+    // Use popup for all browsers (desktop focus)
+    return await signInWithPopup(auth, provider);
   } catch (error) {
     console.error('Google sign-in error:', error);
     if (error.code === 'auth/popup-closed-by-user') {
@@ -87,19 +64,6 @@ export const signInWithGoogle = async () => {
     } else {
       throw new Error(`Sign-in failed: ${error.message}`);
     }
-  }
-};
-
-// Handle redirect result (for mobile Safari)
-export const handleRedirectResult = async () => {
-  try {
-    console.log('Checking for redirect result...');
-    const result = await getRedirectResult(auth);
-    console.log('Redirect result:', result);
-    return result;
-  } catch (error) {
-    console.error('Redirect result error:', error);
-    throw error;
   }
 };
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { TextField, Button, Checkbox, FormControlLabel, InputAdornment, IconButton, CircularProgress } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { signInWithGoogle, handleRedirectResult } from '../firebase';
+import { signInWithGoogle } from '../firebase';
 import { Heart, Shield, Sparkles, ArrowRight } from 'lucide-react';
 import { sendLogin, getParentProfile, googleSignIn } from '../services/api';
 
@@ -16,42 +16,7 @@ const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Handle redirect result on component mount (for mobile Safari)
-  React.useEffect(() => {
-    const handleRedirect = async () => {
-      try {
-        console.log('Checking for redirect result...');
-        const result = await handleRedirectResult();
-        if (result) {
-          console.log('Redirect result received:', result);
-          setLoading(true); // Set loading state for redirect
-          const idToken = await result.user.getIdToken();
-          localStorage.setItem('userEmail', result.user.email || '');
-          
-          console.log('Calling googleSignIn with token...');
-          const data = await googleSignIn(idToken, result.user.email || '');
-          console.log('Google sign-in response:', data);
-          
-          if (!data.profileComplete) {
-            console.log('Profile incomplete, navigating to setup-profile');
-            navigate("/setup-profile");
-          } else {
-            console.log('Profile complete, navigating to dashboard');
-            navigate("/parent-dashboard");
-          }
-        } else {
-          console.log('No redirect result found - user needs to click Google button');
-          // Don't auto-authenticate - let user click the button manually
-        }
-      } catch (error) {
-        console.error('Redirect handling error:', error);
-        setError('Google sign-in failed');
-        setLoading(false);
-      }
-    };
-    
-    handleRedirect();
-  }, [navigate]);
+  // No auto-authentication - user must click the button manually
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,46 +70,34 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  // Google sign-in handler (assumes Firebase is set up)
+  // Google sign-in handler
   const handleGoogleSignIn = async () => {
-    console.log('Google sign-in button clicked'); // Debug log
+    console.log('Google sign-in button clicked');
     setError('');
     setLoading(true);
     try {
-      console.log('Calling signInWithGoogle...'); // Debug log
+      console.log('Calling signInWithGoogle...');
       const result = await signInWithGoogle();
       
-      // Check if result is null (redirect method for mobile Safari)
-      if (!result) {
-        console.log('Redirect method used, result will be handled by useEffect');
-        return; // Exit early, redirect result will be handled by useEffect
-      }
-      
-      console.log('Google sign-in successful, getting ID token...'); // Debug log
+      console.log('Google sign-in successful, getting ID token...');
       const idToken = await result.user.getIdToken();
-
       localStorage.setItem('userEmail', result.user.email || '');
-      console.log('Making request to /auth/google...'); // Debug log
-
-      // Send the token to your backend for authentication/registration
+      
+      console.log('Making request to /auth/google...');
       const data = await googleSignIn(idToken, result.user.email || '');
       
-      console.log('Response data:', data); // Debug log
+      console.log('Response data:', data);
       console.log('profileComplete:', data.profileComplete);
-      console.log('data keys:', Object.keys(data));
       
       if (!data.profileComplete) {
         console.log('Profile incomplete, navigating to setup-profile');
         navigate("/setup-profile");
       } else {
         console.log('Profile complete, navigating to dashboard');
-        // Add a longer delay to ensure cookies are set
-        setTimeout(() => {
-          navigate("/parent-dashboard");
-        }, 500);
+        navigate("/parent-dashboard");
       }
     } catch (error) {
-      console.error('Google sign-in error:', error); // Debug log
+      console.error('Google sign-in error:', error);
       setError("Google sign-in failed");
     } finally {
       setLoading(false);
