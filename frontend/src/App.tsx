@@ -21,30 +21,45 @@ const AppRoutes = () => {
   // Hide nav on login/signup/setup-profile
   const hideNav = ['/login', '/signup', '/setup-profile'].includes(location.pathname);
   
-  // Check authentication status by making an API call
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await fetch('https://parenzing.com/profile/parent', {
-          method: 'GET',
-          credentials: 'include',
-          mode: 'cors'
-        });
-        setIsAuthenticated(response.ok);
-      } catch (error) {
-        console.log('Auth check failed:', error);
-        setIsAuthenticated(false);
-      } finally {
-        setAuthChecked(true);
-      }
-    };
-
-    checkAuth();
-  }, [location.pathname]); // Re-check when location changes
+  // Protected routes that require authentication
+  const protectedRoutes = ['/parent-dashboard', '/ai-chat', '/profile'];
+  const isProtectedRoute = protectedRoutes.includes(location.pathname);
   
-  // Show loading while checking auth
-  if (!authChecked) {
+  // Only check authentication for protected routes
+  useEffect(() => {
+    if (isProtectedRoute) {
+      const checkAuth = async () => {
+        try {
+          const response = await fetch('https://parenzing.com/profile/parent', {
+            method: 'GET',
+            credentials: 'include',
+            mode: 'cors'
+          });
+          setIsAuthenticated(response.ok);
+        } catch (error) {
+          console.log('Auth check failed:', error);
+          setIsAuthenticated(false);
+        } finally {
+          setAuthChecked(true);
+        }
+      };
+
+      checkAuth();
+    } else {
+      // For non-protected routes, don't check auth
+      setAuthChecked(true);
+      setIsAuthenticated(false);
+    }
+  }, [location.pathname, isProtectedRoute]);
+  
+  // Show loading while checking auth for protected routes
+  if (isProtectedRoute && !authChecked) {
     return <div>Loading...</div>;
+  }
+  
+  // Redirect to login if accessing protected route without authentication
+  if (isProtectedRoute && authChecked && !isAuthenticated) {
+    return <Navigate to="/login" replace />;
   }
   
   return (
