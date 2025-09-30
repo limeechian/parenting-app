@@ -717,7 +717,7 @@ async def google_auth(request: Request, db: AsyncSession = Depends(get_session))
         httponly=True,
         samesite="none",  # "none" for cross-origin HTTPS
         secure=True,      # True for HTTPS
-        domain=".parenzing.com"  # Set domain for cross-origin cookie sharing
+        # domain omitted for cross-origin compatibility
     )
 
     # Ensure CORS headers are set for manual response (dynamic by origin)
@@ -1137,7 +1137,7 @@ async def custom_login(
         httponly=True,
         samesite="none",  # "none" for cross-origin HTTPS
         secure=True,      # True for HTTPS
-        domain=".parenzing.com"  # Set domain for cross-origin cookie sharing
+        # domain omitted for cross-origin compatibility
     )
 
     # Ensure CORS headers are set for manual response (dynamic by origin)

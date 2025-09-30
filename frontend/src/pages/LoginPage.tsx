@@ -20,6 +20,7 @@ const LoginPage: React.FC = () => {
   React.useEffect(() => {
     const handleRedirect = async () => {
       try {
+        console.log('Checking for redirect result...');
         const result = await handleRedirectResult();
         if (result) {
           console.log('Redirect result received:', result);
@@ -27,13 +28,19 @@ const LoginPage: React.FC = () => {
           const idToken = await result.user.getIdToken();
           localStorage.setItem('userEmail', result.user.email || '');
           
+          console.log('Calling googleSignIn with token...');
           const data = await googleSignIn(idToken, result.user.email || '');
+          console.log('Google sign-in response:', data);
           
           if (!data.profileComplete) {
+            console.log('Profile incomplete, navigating to setup-profile');
             navigate("/setup-profile");
           } else {
+            console.log('Profile complete, navigating to dashboard');
             navigate("/parent-dashboard");
           }
+        } else {
+          console.log('No redirect result found');
         }
       } catch (error) {
         console.error('Redirect handling error:', error);
