@@ -130,10 +130,18 @@ const LoginPage: React.FC = () => {
       const data = await googleSignIn(idToken, result.user.email || '');
       
       console.log('Response data:', data); // Debug log
+      console.log('profileComplete:', data.profileComplete);
+      console.log('data keys:', Object.keys(data));
+      
       if (!data.profileComplete) {
+        console.log('Profile incomplete, navigating to setup-profile');
         navigate("/setup-profile");
       } else {
-        navigate("/parent-dashboard");
+        console.log('Profile complete, navigating to dashboard');
+        // Add a small delay to ensure cookies are set
+        setTimeout(() => {
+          navigate("/parent-dashboard");
+        }, 100);
       }
     } catch (error) {
       console.error('Google sign-in error:', error); // Debug log

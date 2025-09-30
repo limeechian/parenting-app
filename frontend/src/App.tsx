@@ -30,11 +30,14 @@ const AppRoutes = () => {
     if (isProtectedRoute) {
       const checkAuth = async () => {
         try {
+          console.log('Checking authentication for protected route:', location.pathname);
           const response = await fetch('https://parenzing.com/profile/parent', {
             method: 'GET',
             credentials: 'include',
             mode: 'cors'
           });
+          console.log('Auth check response status:', response.status);
+          console.log('Auth check response ok:', response.ok);
           setIsAuthenticated(response.ok);
         } catch (error) {
           console.log('Auth check failed:', error);
@@ -47,6 +50,7 @@ const AppRoutes = () => {
       checkAuth();
     } else {
       // For non-protected routes, don't check auth
+      console.log('Non-protected route, skipping auth check:', location.pathname);
       setAuthChecked(true);
       setIsAuthenticated(false);
     }
