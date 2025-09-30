@@ -867,6 +867,20 @@ async def test_cookie(request: Request):
         "message": "Cookie test endpoint"
     }
 
+@app.get("/test-auth")
+async def test_auth_status(request: Request):
+    """Test authentication status without requiring authentication"""
+    cookies = request.cookies
+    headers = dict(request.headers)
+    
+    return {
+        "cookies": cookies,
+        "authorization_header": headers.get("authorization"),
+        "content_type": headers.get("content-type"),
+        "origin": headers.get("origin"),
+        "message": "Auth test endpoint"
+    }
+
 @app.get("/api/test-cors")
 async def test_cors_endpoint():
     return {"message": "CORS is working!", "timestamp": datetime.now().isoformat()}

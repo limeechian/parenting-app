@@ -22,10 +22,10 @@ const AppRoutes = () => {
   const hideNav = ['/login', '/signup', '/setup-profile'].includes(location.pathname);
   
   // Protected routes that require authentication
-  const protectedRoutes = ['/ai-chat', '/profile']; // Removed /parent-dashboard from immediate auth check
+  const protectedRoutes = ['/parent-dashboard', '/ai-chat', '/profile'];
   const isProtectedRoute = protectedRoutes.includes(location.pathname);
   
-  // Only check authentication for specific protected routes (not dashboard)
+  // Only check authentication for protected routes
   useEffect(() => {
     if (isProtectedRoute) {
       const checkAuth = async () => {
