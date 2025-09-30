@@ -32,10 +32,10 @@ const AppRoutes = () => {
         try {
           console.log('Checking authentication for protected route:', location.pathname);
           
-          // Add a small delay to ensure cookies are set after Google sign-in
+          // Add a longer delay to ensure cookies are set after Google sign-in
           if (location.pathname === '/parent-dashboard') {
             console.log('Adding delay for dashboard auth check...');
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(resolve => setTimeout(resolve, 2000));
           }
           
           const response = await fetch('https://parenzing.com/profile/parent', {
@@ -45,9 +45,11 @@ const AppRoutes = () => {
           });
           console.log('Auth check response status:', response.status);
           console.log('Auth check response ok:', response.ok);
+          console.log('Setting isAuthenticated to:', response.ok);
           setIsAuthenticated(response.ok);
         } catch (error) {
           console.log('Auth check failed:', error);
+          console.log('Setting isAuthenticated to false due to error');
           setIsAuthenticated(false);
         } finally {
           setAuthChecked(true);
