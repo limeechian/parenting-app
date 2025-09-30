@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { TextField, Button, Checkbox, FormControlLabel, InputAdornment, IconButton, CircularProgress, Radio, RadioGroup, FormControl } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { signInWithGoogle, handleRedirectResult } from '../firebase';
+import { signInWithGoogle } from '../firebase';
 import { Users, Shield, ArrowRight, Heart, Star } from 'lucide-react';
 
 //const API_BASE_URL = 'http://localhost:8000';
@@ -28,34 +28,7 @@ const SignupPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Handle redirect result on component mount (for mobile Safari)
-  React.useEffect(() => {
-    const handleRedirect = async () => {
-      try {
-        const result = await handleRedirectResult();
-        if (result) {
-          console.log('Redirect result received:', result);
-          setLoading(true); // Set loading state for redirect
-          const idToken = await result.user.getIdToken();
-          localStorage.setItem('userEmail', result.user.email || '');
-          
-          const data = await googleSignIn(idToken, result.user.email || '');
-          
-          if (!data.profileComplete) {
-            navigate("/setup-profile");
-          } else {
-            navigate("/parent-dashboard");
-          }
-        }
-      } catch (error) {
-        console.error('Redirect handling error:', error);
-        setError('Google sign-in failed');
-        setLoading(false);
-      }
-    };
-    
-    handleRedirect();
-  }, [navigate]);
+  // No auto-authentication - user must click the button manually
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,7 +78,7 @@ const SignupPage: React.FC = () => {
     }
   };
 
-  // Google sign-in handler (assumes Firebase is set up)
+  // Google sign-in handler
   const handleGoogleSignIn = async () => {
     setError('');
     setLoading(true);
@@ -113,22 +86,12 @@ const SignupPage: React.FC = () => {
       console.log('Starting Google sign-in...');
       const result = await signInWithGoogle();
       
-      // Check if result is null (redirect method for mobile Safari)
-      if (!result) {
-        console.log('Redirect method used, result will be handled by useEffect');
-        return; // Exit early, redirect result will be handled by useEffect
-      }
-      
       console.log('Firebase sign-in successful:', result.user.email);
       
       const idToken = await result.user.getIdToken();
-      console.log('Firebase token obtained, length:', idToken.length);
-      console.log('Token preview:', idToken.substring(0, 50) + '...');
-  
       localStorage.setItem('userEmail', result.user.email || '');
-  
+      
       console.log('Calling backend API...');
-      // Use centralized API service
       const data = await googleSignIn(idToken, result.user.email || '');
       console.log('Backend response:', data);
       
