@@ -65,6 +65,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSuccessfulSignIn }) => {
           // Notify App.tsx that we just signed in successfully
           if (onSuccessfulSignIn) {
             onSuccessfulSignIn();
+            // Wait a tiny bit for React state to update before navigating
+            await new Promise(resolve => setTimeout(resolve, 100));
           }
           navigate('/parent-dashboard');
         } else {
@@ -122,6 +124,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSuccessfulSignIn }) => {
         // Notify App.tsx that we just signed in successfully
         if (onSuccessfulSignIn) {
           onSuccessfulSignIn();
+          // Wait a tiny bit for React state to update before navigating
+          await new Promise(resolve => setTimeout(resolve, 100));
         }
         navigate("/parent-dashboard");
       }
