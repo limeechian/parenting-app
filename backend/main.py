@@ -162,6 +162,7 @@ def verify_firebase_token(token: str):
 # -------------------- FastAPI App --------------------
 # FastAPI app
 app = FastAPI()
+'''
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -179,6 +180,7 @@ app.add_middleware(
     allow_headers=["Content-Type", "Authorization", "X-Requested-With", "Accept", "Accept-Language", "Accept-Encoding", "Referer", "Origin"],
     expose_headers=["*"]
 )
+'''
 
 # Add explicit OPTIONS handler for all routes
 @app.options("/{full_path:path}")
@@ -219,7 +221,9 @@ async def add_cors_headers(request: Request, call_next):
                 "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
                 "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With, Accept, Accept-Language, Accept-Encoding, Referer, Origin",
                 "Access-Control-Allow-Credentials": "true",
-                "Access-Control-Max-Age": "86400"
+                "Access-Control-Max-Age": "86400",
+                "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+                "Pragma": "no-cache"
             }
         )
     
@@ -245,6 +249,8 @@ async def add_cors_headers(request: Request, call_next):
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Accept-Language, Accept-Encoding, Referer, Origin"
     response.headers["Access-Control-Expose-Headers"] = "*"
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
     
     return response
 
