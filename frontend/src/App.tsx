@@ -15,8 +15,10 @@ import './firebase';
 
 const AppRoutes = () => {
   const location = useLocation();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [authChecked, setAuthChecked] = useState(false);
+  // Initialize auth state based on token presence
+  const hasToken = () => !!localStorage.getItem('auth_token');
+  const [isAuthenticated, setIsAuthenticated] = useState(hasToken());
+  const [authChecked, setAuthChecked] = useState(hasToken());
   const [justSignedIn, setJustSignedIn] = useState(false);
   
   // Hide nav on login/signup/setup-profile
