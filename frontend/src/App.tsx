@@ -26,6 +26,7 @@ const AppRoutes = () => {
   const protectedRoutes = ['/parent-dashboard', '/ai-chat', '/profile'];
   const isProtectedRoute = protectedRoutes.includes(location.pathname);
   
+  
   // Only check authentication for protected routes
   useEffect(() => {
     if (isProtectedRoute) {
