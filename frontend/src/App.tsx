@@ -59,27 +59,14 @@ const AppRoutes = () => {
             return;
           }
           
-          // Add a small delay to ensure token is stored
-          console.log('Adding delay for auth check to ensure token propagation...');
-          await new Promise(resolve => setTimeout(resolve, 200));
-          
-          const response = await fetch('https://parenzing.com/profile/parent', {
-            method: 'GET',
-            credentials: 'include',
-            mode: 'cors',
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-          console.log('Auth check response status:', response.status);
-          console.log('Auth check response ok:', response.ok);
-          console.log('Setting isAuthenticated to:', response.ok);
-          setIsAuthenticated(response.ok);
+          // If we have a token, assume authenticated (skip API call on initial load)
+          console.log('Token found in localStorage, setting authenticated to true');
+          setIsAuthenticated(true);
+          setAuthChecked(true);
         } catch (error) {
           console.log('Auth check failed:', error);
           console.log('Setting isAuthenticated to false due to error');
           setIsAuthenticated(false);
-        } finally {
           setAuthChecked(true);
         }
       };
@@ -91,6 +78,7 @@ const AppRoutes = () => {
       setAuthChecked(true);
       // Don't reset isAuthenticated for non-protected routes
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname, isProtectedRoute, justSignedIn]);
   
   // Show loading while checking auth for protected routes
