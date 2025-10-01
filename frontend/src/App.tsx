@@ -50,14 +50,26 @@ const AppRoutes = () => {
         try {
           console.log('Checking authentication for protected route:', location.pathname);
           
-          // Add a longer delay to ensure cookies are set after Google sign-in
-          console.log('Adding delay for auth check to ensure cookie propagation...');
-          await new Promise(resolve => setTimeout(resolve, 500));
+          // Get token from localStorage
+          const token = localStorage.getItem('auth_token');
+          if (!token) {
+            console.log('No auth token found in localStorage');
+            setIsAuthenticated(false);
+            setAuthChecked(true);
+            return;
+          }
+          
+          // Add a small delay to ensure token is stored
+          console.log('Adding delay for auth check to ensure token propagation...');
+          await new Promise(resolve => setTimeout(resolve, 200));
           
           const response = await fetch('https://parenzing.com/profile/parent', {
             method: 'GET',
             credentials: 'include',
-            mode: 'cors'
+            mode: 'cors',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
           });
           console.log('Auth check response status:', response.status);
           console.log('Auth check response ok:', response.ok);

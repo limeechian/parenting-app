@@ -27,7 +27,16 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSuccessfulSignIn }) => {
     setLoading(true);
     try {
       // Use the API service for login
-      await sendLogin({ identifier: identifier, password });
+      const loginData = await sendLogin({ identifier: identifier, password });
+      
+      // Store the JWT token in localStorage for subsequent API calls
+      if (loginData.access_token) {
+        localStorage.setItem('auth_token', loginData.access_token);
+        console.log('Token stored in localStorage');
+      }
+      
+      // Wait a bit to ensure token is stored
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       // Store user identifier for profile setup
       localStorage.setItem('userEmail', identifier);
@@ -95,6 +104,15 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSuccessfulSignIn }) => {
       
       console.log('Response data:', data);
       console.log('profileComplete:', data.profileComplete);
+      
+      // Store the JWT token in localStorage for subsequent API calls
+      if (data.access_token) {
+        localStorage.setItem('auth_token', data.access_token);
+        console.log('Token stored in localStorage');
+      }
+      
+      // Wait a bit to ensure token is stored
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       if (!data.profileComplete) {
         console.log('Profile incomplete, navigating to setup-profile');

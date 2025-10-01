@@ -15,12 +15,14 @@ import { API_BASE_URL } from '../config/api';
 
 // Common fetch options to handle mixed content and CORS
 const getFetchOptions = (method: string, body?: any, additionalHeaders?: Record<string, string>) => {
+  const token = localStorage.getItem('auth_token');
   const options: RequestInit = {
     method,
     mode: 'cors' as RequestMode,
     credentials: 'include' as RequestCredentials,
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
       ...additionalHeaders
     }
   };
@@ -96,9 +98,11 @@ export const googleSignIn = async (idToken: string, email: string) => {
 };
 
 export const getParentProfile = async () => {
+  const token = localStorage.getItem('auth_token');
   const res = await makeRequest(`${API_BASE_URL}/profile/parent`, {
     mode: 'cors',
-    credentials: 'include'
+    credentials: 'include',
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
   });
   if (!res.ok) throw new Error('Failed to fetch parent profile');
   return res.json();
@@ -111,9 +115,11 @@ export const updateParentProfile = async (profile: any) => {
 };
 
 export const getChildren = async () => {
+  const token = localStorage.getItem('auth_token');
   const res = await makeRequest(`${API_BASE_URL}/profile/children`, {
     mode: 'cors',
-    credentials: 'include'
+    credentials: 'include',
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
   });
   if (!res.ok) throw new Error('Failed to fetch children');
   return res.json();

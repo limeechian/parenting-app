@@ -699,7 +699,8 @@ async def google_auth(request: Request, db: AsyncSession = Depends(get_session))
     token = await strategy.write_token(user)
     logger.info(f"JWT token: {token}")
     logger.info(f"Setting cookie for origin: {request.headers.get('origin')}")
-    response_content = {"profileComplete": profile_complete, "id": user.id}
+    # Return token in response body for frontend to store (since cookies don't work cross-origin)
+    response_content = {"profileComplete": profile_complete, "id": user.id, "access_token": token, "token_type": "bearer"}
     response = Response(content=json.dumps(response_content), media_type="application/json")
 
     # Helper to ensure samesite is correct type
@@ -1230,8 +1231,13 @@ async def get_parent_profile(request: Request, user: User = Depends(current_acti
     if not profile:
         raise HTTPException(status_code=404, detail="Parent profile not found")
     
-    # Add explicit CORS headers
-    response_data = profile.__dict__
+    # Add explicit CORS headers // response_data = profile.__dict__
+    # Convert profile to dict, excluding SQLAlchemy internal state and handling datetime objects
+    response_data = {
+        key: value.isoformat() if isinstance(value, (datetime, date)) else value
+        for key, value in profile.__dict__.items()
+        if not key.startswith('_')
+    }
     response = Response(content=json.dumps(response_data), media_type="application/json")
     
     # Set CORS headers dynamically based on origin
