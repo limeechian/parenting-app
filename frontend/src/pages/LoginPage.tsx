@@ -21,8 +21,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSuccessfulSignIn }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // No auto-authentication - user must click the button manually
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');

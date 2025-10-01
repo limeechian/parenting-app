@@ -35,8 +35,8 @@ const AppRoutes = () => {
         console.log('Just signed in, skipping auth check and setting authenticated to true');
         setIsAuthenticated(true);
         setAuthChecked(true);
-        // Don't reset the flag immediately - let it persist for this navigation
-        setTimeout(() => setJustSignedIn(false), 1000); // Reset after 1 second
+        // Reset the flag after 3 seconds to match the delay
+        setTimeout(() => setJustSignedIn(false), 3000);
         return;
       }
 
@@ -51,10 +51,8 @@ const AppRoutes = () => {
           console.log('Checking authentication for protected route:', location.pathname);
           
           // Add a longer delay to ensure cookies are set after Google sign-in
-          if (location.pathname === '/parent-dashboard') {
-            console.log('Adding delay for dashboard auth check...');
-            await new Promise(resolve => setTimeout(resolve, 2000));
-          }
+          console.log('Adding delay for auth check to ensure cookie propagation...');
+          await new Promise(resolve => setTimeout(resolve, 500));
           
           const response = await fetch('https://parenzing.com/profile/parent', {
             method: 'GET',
@@ -81,7 +79,7 @@ const AppRoutes = () => {
       setAuthChecked(true);
       // Don't reset isAuthenticated for non-protected routes
     }
-  }, [location.pathname, isProtectedRoute, justSignedIn, isAuthenticated, authChecked]);
+  }, [location.pathname, isProtectedRoute, justSignedIn]);
   
   // Show loading while checking auth for protected routes
   if (isProtectedRoute && !authChecked) {
