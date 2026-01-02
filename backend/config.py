@@ -129,8 +129,10 @@ CORS_ORIGINS = [
     "http://localhost:8080",  # Alternative local port
     "https://master.dcmcchu8q16tm.amplifyapp.com",  # AWS Amplify master branch
     "https://dcmcchu8q16tm.amplifyapp.com",  # AWS Amplify production
-    "https://parenzing.com",  # Production domain (HTTPS)
-    "http://parenzing.com",  # Production domain (HTTP)
+    "https://www.parenzing.com",  # Production domain with www (HTTPS)
+    "http://www.parenzing.com",  # Production domain with www (HTTP)
+    "https://parenzing.com",  # Production domain root (HTTPS)
+    "http://parenzing.com",  # Production domain root (HTTP)
     "http://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com",  # AWS Load Balancer (HTTP)
     "https://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com"  # AWS Load Balancer (HTTPS)
 ]
