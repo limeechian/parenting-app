@@ -1353,8 +1353,7 @@ const SetupProfile: React.FC = () => {
               style={{ color: "#AA855B" }}
             >
               <li>• Find verified professionals in your area</li>
-              <li>• Connect you with local parenting communities</li>
-              <li>• Recommend location-specific services and events</li>
+              <li>• Match you with relevant professional services nearby</li>
             </ul>
           </div>
         </div>

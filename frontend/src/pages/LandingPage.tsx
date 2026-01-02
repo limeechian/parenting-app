@@ -720,10 +720,10 @@ const LandingPage: React.FC = () => {
                 className="text-sm sm:text-base leading-relaxed"
                 style={{ color: "#32332D" }}
               >
-                Browse verified professionals, submit requests, and access local
-                services aligned to your needs. Professionals submit credentials
-                for coordinator review with approved listings in searchable
-                directory.
+                Browse verified professionals, view contact details, and access
+                local services aligned to your needs. Professionals submit
+                credentials for coordinator review with approved listings in
+                searchable directory.
               </p>
             </div>
           </div>

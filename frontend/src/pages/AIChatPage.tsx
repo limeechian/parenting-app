@@ -333,9 +333,9 @@ const AIChatPage: React.FC = () => {
       active: true,
       confidence: 85,
       description:
-        "I help you find local resources, connect with other parents, and match you with professional services in your area.",
+        "I help you find relevant resources, connect with other parents, and match you with professional services in your area.",
       exampleQuestions: [
-        "What parenting resources are available in my area?",
+        "What parenting resources are available?",
         "How can I connect with other parents?",
         "Do you know any child psychologists near me?",
       ],
