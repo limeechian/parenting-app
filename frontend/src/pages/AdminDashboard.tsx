@@ -161,7 +161,6 @@ const AdminDashboard: React.FC = () => {
     email: "",
     password: "",
     role: "content_manager",
-    is_active: true,
   });
 
   // Updating state
@@ -361,7 +360,6 @@ const AdminDashboard: React.FC = () => {
         email: "",
         password: "",
         role: "content_manager",
-        is_active: true,
       });
       await loadData();
     } catch (error: any) {
@@ -814,24 +812,30 @@ const AdminDashboard: React.FC = () => {
                 <div
                   className="overflow-x-scroll -mx-3 sm:mx-0"
                   style={{
-                    scrollbarWidth: "thin",
+                    scrollbarWidth: "auto",
                     scrollbarColor: "#AA855B #F5F5F5",
                   }}
                 >
                   <style>{`
                     div.overflow-x-scroll::-webkit-scrollbar {
-                      height: 8px;
+                      height: 12px;
                     }
                     div.overflow-x-scroll::-webkit-scrollbar-track {
                       background: #F5F5F5;
-                      border-radius: 4px;
+                      border-radius: 6px;
+                      border: 1px solid #E5E7EB;
                     }
                     div.overflow-x-scroll::-webkit-scrollbar-thumb {
                       background: #AA855B;
-                      border-radius: 4px;
+                      border-radius: 6px;
+                      border: 2px solid #F5F5F5;
+                      min-width: 40px;
                     }
                     div.overflow-x-scroll::-webkit-scrollbar-thumb:hover {
                       background: #8B6F4A;
+                    }
+                    div.overflow-x-scroll::-webkit-scrollbar-thumb:active {
+                      background: #7A5F3F;
                     }
                   `}</style>
                   <table className="w-full min-w-[600px]">
@@ -1223,24 +1227,30 @@ const AdminDashboard: React.FC = () => {
                 <div
                   className="overflow-x-scroll -mx-3 sm:mx-0"
                   style={{
-                    scrollbarWidth: "thin",
+                    scrollbarWidth: "auto",
                     scrollbarColor: "#AA855B #F5F5F5",
                   }}
                 >
                   <style>{`
                     div.overflow-x-scroll::-webkit-scrollbar {
-                      height: 8px;
+                      height: 12px;
                     }
                     div.overflow-x-scroll::-webkit-scrollbar-track {
                       background: #F5F5F5;
-                      border-radius: 4px;
+                      border-radius: 6px;
+                      border: 1px solid #E5E7EB;
                     }
                     div.overflow-x-scroll::-webkit-scrollbar-thumb {
                       background: #AA855B;
-                      border-radius: 4px;
+                      border-radius: 6px;
+                      border: 2px solid #F5F5F5;
+                      min-width: 40px;
                     }
                     div.overflow-x-scroll::-webkit-scrollbar-thumb:hover {
                       background: #8B6F4A;
+                    }
+                    div.overflow-x-scroll::-webkit-scrollbar-thumb:active {
+                      background: #7A5F3F;
                     }
                   `}</style>
                   <table className="w-full min-w-[600px]">
@@ -1922,7 +1932,6 @@ const AdminDashboard: React.FC = () => {
                         email: "",
                         password: "",
                         role: "content_manager",
-                        is_active: true,
                       });
                     }}
                     className="p-2 rounded-lg transition-colors"
@@ -2051,27 +2060,6 @@ const AdminDashboard: React.FC = () => {
                     )}
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="is_active"
-                    checked={createFormData.is_active}
-                    onChange={(e) =>
-                      setCreateFormData({
-                        ...createFormData,
-                        is_active: e.target.checked,
-                      })
-                    }
-                    className="w-4 h-4"
-                  />
-                  <label
-                    htmlFor="is_active"
-                    className="text-sm font-['Poppins']"
-                    style={{ color: "#32332D" }}
-                  >
-                    Active
-                  </label>
-                </div>
                 <div className="flex items-center space-x-2 pt-4">
                   <button
                     onClick={handleCreateUser}
@@ -2096,7 +2084,6 @@ const AdminDashboard: React.FC = () => {
                         email: "",
                         password: "",
                         role: "content_manager",
-                        is_active: true,
                       });
                     }}
                     className="px-4 py-2 rounded-lg font-['Poppins'] font-medium transition-colors"
