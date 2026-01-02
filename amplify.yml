@@ -25,6 +25,7 @@ frontend:
         - key: 'X-XSS-Protection'
           value: '1; mode=block'
   redirects:
-    - source: '</^[^.]+$|\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|ttf|map|json)$)([^.]+$)/>'
+    # Redirect all non-file requests to index.html for React Router (SPA routing)
+    - source: '/<*>'
       target: '/index.html'
       status: '200' 
