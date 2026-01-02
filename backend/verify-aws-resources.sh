@@ -133,3 +133,4 @@ echo "3. If service is stopped, restart it or run ./deploy.sh"
 echo "4. Verify environment variables in task-definition.json"
 echo ""
 
+

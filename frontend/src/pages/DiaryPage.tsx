@@ -48,6 +48,7 @@ import {
   Chip,
   TextField,
   Button,
+  Tooltip,
 } from "@mui/material";
 // Import lucide-react icons for UI elements
 import {
@@ -5740,41 +5741,57 @@ const DiaryPage: React.FC = () => {
                   </div>
 
                   {/* Right side: Generate Monthly Summary button - hidden in savedList mode */}
+                  {/* 
+                    Button is disabled when no diary entries exist, as summaries require data to analyze.
+                    Tooltip explains why button is disabled when hovering over it.
+                  */}
                   {(monthlySummaryViewMode === "initial" ||
                     monthlySummaryViewMode === "generated") && (
-                    <button
-                      onClick={handleGenerateMonthlySummary}
-                      disabled={isGeneratingSummary}
-                      className="w-full sm:w-auto px-4 sm:px-6 py-2 rounded-lg transition-all duration-200 font-medium font-['Poppins'] text-xs sm:text-sm flex items-center justify-center sm:justify-start space-x-2 disabled:opacity-50"
-                      style={{
-                        backgroundColor: isGeneratingSummary
-                          ? "#AA855B"
-                          : "#F2742C",
-                        color: "#F5F5F5",
-                      }}
-                      onMouseEnter={(e) => {
-                        if (!isGeneratingSummary) {
-                          e.currentTarget.style.backgroundColor = "#E55A1F";
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!isGeneratingSummary) {
-                          e.currentTarget.style.backgroundColor = "#F2742C";
-                        }
-                      }}
+                    <Tooltip
+                      title={
+                        diaryEntries.length === 0
+                          ? "Add diary entries to generate summaries"
+                          : ""
+                      }
+                      arrow
+                      placement="top"
                     >
-                      {isGeneratingSummary ? (
-                        <>
-                          <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
-                          <span>Generating...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Brain className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                          <span>Generate Monthly Summary</span>
-                        </>
-                      )}
-                    </button>
+                      <span className="w-full sm:w-auto inline-block">
+                        <button
+                          onClick={handleGenerateMonthlySummary}
+                          disabled={isGeneratingSummary || diaryEntries.length === 0}
+                          className="w-full sm:w-auto px-4 sm:px-6 py-2 rounded-lg transition-all duration-200 font-medium font-['Poppins'] text-xs sm:text-sm flex items-center justify-center sm:justify-start space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                          style={{
+                            backgroundColor: isGeneratingSummary || diaryEntries.length === 0
+                              ? "#AA855B"
+                              : "#F2742C",
+                            color: "#F5F5F5",
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isGeneratingSummary && diaryEntries.length > 0) {
+                              e.currentTarget.style.backgroundColor = "#E55A1F";
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isGeneratingSummary && diaryEntries.length > 0) {
+                              e.currentTarget.style.backgroundColor = "#F2742C";
+                            }
+                          }}
+                        >
+                          {isGeneratingSummary ? (
+                            <>
+                              <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
+                              <span>Generating...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Brain className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                              <span>Generate Monthly Summary</span>
+                            </>
+                          )}
+                        </button>
+                      </span>
+                    </Tooltip>
                   )}
                 </div>
               )}
@@ -6407,29 +6424,46 @@ const DiaryPage: React.FC = () => {
                     </span>
                   )}
                   {/* Only show Regenerate button for newly generated (unsaved) summaries */}
+                  {/* 
+                    Regenerate button is disabled when no diary entries exist.
+                    This prevents regenerating summaries when all entries have been deleted.
+                    Tooltip explains why button is disabled when hovering over it.
+                  */}
                   {!displaySummary.is_saved && (
-                    <button
-                      onClick={handleGenerateMonthlySummary}
-                      disabled={isGeneratingSummary}
-                      className="px-4 sm:px-6 py-1.5 sm:py-2 rounded-lg transition-all duration-200 font-medium font-['Poppins'] text-xs sm:text-sm flex items-center justify-center sm:justify-start space-x-2 disabled:opacity-50"
-                      style={{
-                        backgroundColor: "#AA855B",
-                        color: "#F5F5F5",
-                      }}
-                      onMouseEnter={(e) => {
-                        if (!isGeneratingSummary) {
-                          e.currentTarget.style.backgroundColor = "#8B6F4A";
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!isGeneratingSummary) {
-                          e.currentTarget.style.backgroundColor = "#AA855B";
-                        }
-                      }}
+                    <Tooltip
+                      title={
+                        diaryEntries.length === 0
+                          ? "Add diary entries to generate summaries"
+                          : ""
+                      }
+                      arrow
+                      placement="top"
                     >
-                      <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                      <span>Regenerate</span>
-                    </button>
+                      <span className="inline-block">
+                        <button
+                          onClick={handleGenerateMonthlySummary}
+                          disabled={isGeneratingSummary || diaryEntries.length === 0}
+                          className="px-4 sm:px-6 py-1.5 sm:py-2 rounded-lg transition-all duration-200 font-medium font-['Poppins'] text-xs sm:text-sm flex items-center justify-center sm:justify-start space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                          style={{
+                            backgroundColor: "#AA855B",
+                            color: "#F5F5F5",
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isGeneratingSummary && diaryEntries.length > 0) {
+                              e.currentTarget.style.backgroundColor = "#8B6F4A";
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isGeneratingSummary && diaryEntries.length > 0) {
+                              e.currentTarget.style.backgroundColor = "#AA855B";
+                            }
+                          }}
+                        >
+                          <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                          <span>Regenerate</span>
+                        </button>
+                      </span>
+                    </Tooltip>
                   )}
                 </div>
               ) : monthlySummaryViewMode === "savedDetail" ? (
@@ -6640,41 +6674,57 @@ const DiaryPage: React.FC = () => {
                   </div>
 
                   {/* Right side: Generate Weekly Summary button - hidden in savedList mode */}
+                  {/* 
+                    Button is disabled when no diary entries exist, as summaries require data to analyze.
+                    Tooltip explains why button is disabled when hovering over it.
+                  */}
                   {(weeklySummaryViewMode === "initial" ||
                     weeklySummaryViewMode === "generated") && (
-                    <button
-                      onClick={handleGenerateWeeklySummary}
-                      disabled={isGeneratingWeeklySummary}
-                      className="w-full sm:w-auto px-4 sm:px-6 py-2 rounded-lg transition-all duration-200 font-medium font-['Poppins'] text-xs sm:text-sm flex items-center justify-center sm:justify-start space-x-2 disabled:opacity-50"
-                      style={{
-                        backgroundColor: isGeneratingWeeklySummary
-                          ? "#AA855B"
-                          : "#F2742C",
-                        color: "#F5F5F5",
-                      }}
-                      onMouseEnter={(e) => {
-                        if (!isGeneratingWeeklySummary) {
-                          e.currentTarget.style.backgroundColor = "#E55A1F";
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!isGeneratingWeeklySummary) {
-                          e.currentTarget.style.backgroundColor = "#F2742C";
-                        }
-                      }}
+                    <Tooltip
+                      title={
+                        diaryEntries.length === 0
+                          ? "Add diary entries to generate summaries"
+                          : ""
+                      }
+                      arrow
+                      placement="top"
                     >
-                      {isGeneratingWeeklySummary ? (
-                        <>
-                          <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
-                          <span>Generating...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Brain className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                          <span>Generate Weekly Summary</span>
-                        </>
-                      )}
-                    </button>
+                      <span className="w-full sm:w-auto inline-block">
+                        <button
+                          onClick={handleGenerateWeeklySummary}
+                          disabled={isGeneratingWeeklySummary || diaryEntries.length === 0}
+                          className="w-full sm:w-auto px-4 sm:px-6 py-2 rounded-lg transition-all duration-200 font-medium font-['Poppins'] text-xs sm:text-sm flex items-center justify-center sm:justify-start space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                          style={{
+                            backgroundColor: isGeneratingWeeklySummary || diaryEntries.length === 0
+                              ? "#AA855B"
+                              : "#F2742C",
+                            color: "#F5F5F5",
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isGeneratingWeeklySummary && diaryEntries.length > 0) {
+                              e.currentTarget.style.backgroundColor = "#E55A1F";
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isGeneratingWeeklySummary && diaryEntries.length > 0) {
+                              e.currentTarget.style.backgroundColor = "#F2742C";
+                            }
+                          }}
+                        >
+                          {isGeneratingWeeklySummary ? (
+                            <>
+                              <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
+                              <span>Generating...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Brain className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                              <span>Generate Weekly Summary</span>
+                            </>
+                          )}
+                        </button>
+                      </span>
+                    </Tooltip>
                   )}
                 </div>
               )}
@@ -7371,29 +7421,46 @@ const DiaryPage: React.FC = () => {
                           ✓ Saved
                         </span>
                       )}
+                      {/* 
+                        Regenerate button is disabled when no diary entries exist.
+                        This prevents regenerating summaries when all entries have been deleted.
+                        Tooltip explains why button is disabled when hovering over it.
+                      */}
                       {!displayWeeklySummary.is_saved && (
-                        <button
-                          onClick={handleGenerateWeeklySummary}
-                          disabled={isGeneratingWeeklySummary}
-                          className="px-4 sm:px-6 py-1.5 sm:py-2 rounded-lg transition-all duration-200 font-medium font-['Poppins'] text-xs sm:text-sm flex items-center justify-center sm:justify-start space-x-2 disabled:opacity-50"
-                          style={{
-                            backgroundColor: "#AA855B",
-                            color: "#F5F5F5",
-                          }}
-                          onMouseEnter={(e) => {
-                            if (!isGeneratingWeeklySummary) {
-                              e.currentTarget.style.backgroundColor = "#8B6F4A";
-                            }
-                          }}
-                          onMouseLeave={(e) => {
-                            if (!isGeneratingWeeklySummary) {
-                              e.currentTarget.style.backgroundColor = "#AA855B";
-                            }
-                          }}
+                        <Tooltip
+                          title={
+                            diaryEntries.length === 0
+                              ? "Add diary entries to generate summaries"
+                              : ""
+                          }
+                          arrow
+                          placement="top"
                         >
-                          <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                          <span>Regenerate</span>
-                        </button>
+                          <span className="inline-block">
+                            <button
+                              onClick={handleGenerateWeeklySummary}
+                              disabled={isGeneratingWeeklySummary || diaryEntries.length === 0}
+                              className="px-4 sm:px-6 py-1.5 sm:py-2 rounded-lg transition-all duration-200 font-medium font-['Poppins'] text-xs sm:text-sm flex items-center justify-center sm:justify-start space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                              style={{
+                                backgroundColor: "#AA855B",
+                                color: "#F5F5F5",
+                              }}
+                              onMouseEnter={(e) => {
+                                if (!isGeneratingWeeklySummary && diaryEntries.length > 0) {
+                                  e.currentTarget.style.backgroundColor = "#8B6F4A";
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                if (!isGeneratingWeeklySummary && diaryEntries.length > 0) {
+                                  e.currentTarget.style.backgroundColor = "#AA855B";
+                                }
+                              }}
+                            >
+                              <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                              <span>Regenerate</span>
+                            </button>
+                          </span>
+                        </Tooltip>
                       )}
                     </div>
                   ) : weeklySummaryViewMode === "savedDetail" ? (

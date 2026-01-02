@@ -345,6 +345,7 @@ const Navigation: React.FC = () => {
                 });
 
                 if (profileRes.ok) {
+                  // Profile exists - use profile data for display name and avatar
                   const profileData = await profileRes.json();
                   const displayName = getDisplayName(
                     profileData,
@@ -357,9 +358,24 @@ const Navigation: React.FC = () => {
                     role: role,
                     avatar: profileData.profile_picture_url || "",
                   });
+                } else if (profileRes.status === 404) {
+                  // Profile doesn't exist yet (user skipped setup), use email fallback
+                  // This allows navigation to display user info even without profile
+                  setUser({
+                    name: getDisplayName({}, userEmail, role),
+                    role: role,
+                    avatar: "",
+                  });
                 }
               } catch (error) {
                 console.error("Error refreshing profile:", error);
+                // Fallback to email prefix on error
+                // Ensures navigation always shows user info even if profile fetch fails
+                setUser({
+                  name: getDisplayName({}, userEmail, role),
+                  role: role,
+                  avatar: "",
+                });
               }
             }
           })

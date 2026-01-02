@@ -133,40 +133,55 @@ const ParentDashboard: React.FC = () => {
 
   /**
    * Fetches all dashboard data from the API
-   * Retrieves profile, children, statistics, and recent activities
+   * 
+   * Retrieves profile, children, statistics, and recent activities.
+   * Handles missing profiles gracefully - if user skipped setup, the dashboard
+   * will still load with default values (empty arrays, zero stats, email-based display name).
+   * 
+   * All API functions handle 404 responses internally, so missing data doesn't cause errors.
    */
   const fetchData = async () => {
     setLoading(true);
     try {
       const [parentData, childrenData, statsData, activityData] =
         await Promise.all([
-          getParentProfile(),
-          getChildren(),
-          getParentStats(),
+          getParentProfile(), // Returns null if profile doesn't exist (404)
+          getChildren(), // Returns [] if no children exist (404)
+          getParentStats(), // Returns default stats if profile doesn't exist (404)
           getParentRecentActivity(5).catch((error) => {
             console.error("❌ Error fetching recent activity:", error);
-            console.error("Error details:", {
-              message: error.message,
-              stack: error.stack,
-              response: error.response,
-            });
             // Log the error but don't fail the entire dashboard load
             return { activities: [] };
           }),
         ]);
 
-      setChildren(childrenData);
-      setStats(statsData);
-      setRecentActivities(activityData.activities || []);
+      // Set state with fallback values - ensures dashboard works even without profile
+      setChildren(childrenData || []);
+      setStats(statsData || {
+        children_count: 0,
+        conversations_count: 0,
+        diary_entries_count: 0,
+        communities_joined_count: 0,
+        resources_count: 0,
+        days_active: 0,
+      });
+      setRecentActivities(activityData?.activities || []);
 
       // Get email from localStorage and set display name with fallback logic
+      // If no profile exists, displayName will use email prefix (before @)
       const userEmail = localStorage.getItem("userEmail") || "";
-      const displayNameValue = getDisplayName(parentData, userEmail);
+      const displayNameValue = getDisplayName(parentData || {}, userEmail);
       setDisplayName(displayNameValue);
 
       // Check if profile needs completion and show soft reminder
       // Use childrenData here since children state hasn't been updated yet in this render cycle
       const checkProfileCompletion = () => {
+        // If no profile exists (user skipped setup), show reminder to complete profile
+        if (!parentData) {
+          setShowProfileReminder(true);
+          return;
+        }
+
         const importantFields = [
           "first_name",
           "gender",
@@ -198,7 +213,12 @@ const ParentDashboard: React.FC = () => {
         navigate("/login");
         return;
       }
-      setError("Failed to load dashboard");
+      // Only set error for non-404 errors
+      // 404 errors are handled gracefully by API functions (return null/empty arrays)
+      // so they don't need to be treated as errors here
+      if (!e.message || !e.message.includes("404")) {
+        setError("Failed to load dashboard");
+      }
     } finally {
       setLoading(false);
     }

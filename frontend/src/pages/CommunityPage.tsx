@@ -454,36 +454,53 @@ const CommunityPage: React.FC = () => {
             setCurrentUserId(userData.user_id);
 
             // Fetch user profile to get avatar and name
+            // Handles missing profiles gracefully - falls back to email prefix if profile doesn't exist
             try {
               if (userData.role === "parent") {
                 const profileResponse = await getParentProfile();
-                // ParentProfile returns the profile directly, not nested in 'profile'
-                if (profileResponse?.profile_picture_url) {
-                  setCurrentUserAvatar(profileResponse.profile_picture_url);
+                // Handle null profile (profile doesn't exist yet - user skipped setup)
+                // Use email prefix as fallback display name
+                if (profileResponse === null) {
+                  const fallbackName = userEmail ? userEmail.split("@")[0] : "User";
+                  setCurrentUserName(fallbackName);
+                } else {
+                  // Profile exists - use profile data for name and avatar
+                  // ParentProfile returns the profile directly, not nested in 'profile'
+                  if (profileResponse?.profile_picture_url) {
+                    setCurrentUserAvatar(profileResponse.profile_picture_url);
+                  }
+                  const displayName = getDisplayName(
+                    profileResponse,
+                    userEmail,
+                    userData.role,
+                  );
+                  setCurrentUserName(displayName);
                 }
-                const displayName = getDisplayName(
-                  profileResponse,
-                  userEmail,
-                  userData.role,
-                );
-                setCurrentUserName(displayName);
               } else if (userData.role === "professional") {
                 const profileResponse = await getProfessionalProfile();
-                // ProfessionalProfile might have nested structure
-                const profileData = profileResponse?.profile || profileResponse;
-                if (profileData?.profile_picture_url) {
-                  setCurrentUserAvatar(profileData.profile_picture_url);
+                // Handle null profile (profile doesn't exist yet - user skipped setup)
+                // Use email prefix as fallback display name
+                if (profileResponse === null) {
+                  const fallbackName = userEmail ? userEmail.split("@")[0] : "User";
+                  setCurrentUserName(fallbackName);
+                } else {
+                  // Profile exists - use profile data for name and avatar
+                  // ProfessionalProfile might have nested structure
+                  const profileData = profileResponse?.profile || profileResponse;
+                  if (profileData?.profile_picture_url) {
+                    setCurrentUserAvatar(profileData.profile_picture_url);
+                  }
+                  const displayName = getDisplayName(
+                    profileData,
+                    userEmail,
+                    userData.role,
+                  );
+                  setCurrentUserName(displayName);
                 }
-                const displayName = getDisplayName(
-                  profileData,
-                  userEmail,
-                  userData.role,
-                );
-                setCurrentUserName(displayName);
               }
             } catch (profileErr) {
+              // Fallback to email prefix if profile fetch fails
               console.error("Error fetching user profile:", profileErr);
-              // Fallback to email prefix
               const fallbackName = userEmail ? userEmail.split("@")[0] : "User";
               setCurrentUserName(fallbackName);
             }

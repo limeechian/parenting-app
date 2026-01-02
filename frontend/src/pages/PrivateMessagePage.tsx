@@ -369,32 +369,49 @@ const PrivateMessagePage: React.FC = () => {
             const userData = await response.json();
             setCurrentUserId(userData.user_id);
 
+            // Fetch user profile to get display name and avatar
+            // Handles missing profiles gracefully - falls back to email prefix if profile doesn't exist
             try {
               if (userData.role === "parent") {
                 const profileResponse = await getParentProfile();
-                if (profileResponse?.profile_picture_url) {
-                  setCurrentUserAvatar(profileResponse.profile_picture_url);
+                // Handle null profile (profile doesn't exist yet - user skipped setup)
+                // Use email prefix as fallback display name
+                if (profileResponse === null) {
+                  setCurrentUserName(userEmail ? userEmail.split("@")[0] : "User");
+                } else {
+                  // Profile exists - use profile data for name and avatar
+                  if (profileResponse?.profile_picture_url) {
+                    setCurrentUserAvatar(profileResponse.profile_picture_url);
+                  }
+                  const name =
+                    profileResponse?.first_name && profileResponse?.last_name
+                      ? `${profileResponse.first_name} ${profileResponse.last_name}`
+                      : profileResponse?.first_name ||
+                        userEmail.split("@")[0] ||
+                        "User";
+                  setCurrentUserName(name);
                 }
-                const name =
-                  profileResponse?.first_name && profileResponse?.last_name
-                    ? `${profileResponse.first_name} ${profileResponse.last_name}`
-                    : profileResponse?.first_name ||
-                      userEmail.split("@")[0] ||
-                      "User";
-                setCurrentUserName(name);
               } else if (userData.role === "professional") {
                 const profileResponse = await getProfessionalProfile();
-                const profileData = profileResponse?.profile || profileResponse;
-                if (profileData?.profile_picture_url) {
-                  setCurrentUserAvatar(profileData.profile_picture_url);
+                // Handle null profile (profile doesn't exist yet - user skipped setup)
+                // Use email prefix as fallback display name
+                if (profileResponse === null) {
+                  setCurrentUserName(userEmail ? userEmail.split("@")[0] : "User");
+                } else {
+                  // Profile exists - use profile data for name and avatar
+                  const profileData = profileResponse?.profile || profileResponse;
+                  if (profileData?.profile_picture_url) {
+                    setCurrentUserAvatar(profileData.profile_picture_url);
+                  }
+                  const name =
+                    profileData?.business_name ||
+                    userEmail.split("@")[0] ||
+                    "User";
+                  setCurrentUserName(name);
                 }
-                const name =
-                  profileData?.business_name ||
-                  userEmail.split("@")[0] ||
-                  "User";
-                setCurrentUserName(name);
               }
             } catch (profileErr) {
+              // Fallback to email prefix if profile fetch fails
               console.error("Error fetching user profile:", profileErr);
               setCurrentUserName(userEmail ? userEmail.split("@")[0] : "User");
             }

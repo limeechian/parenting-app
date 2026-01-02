@@ -274,11 +274,24 @@ const ProfessionalProfile: React.FC = () => {
     Record<string, string>
   >({});
 
+  /**
+   * Fetches the professional profile from the API
+   * 
+   * Handles missing profiles gracefully - if profile doesn't exist (404 response),
+   * sets profile to null and clears error. This allows the page to display
+   * an empty state instead of an error message.
+   */
   const fetchProfile = async () => {
     setLoading(true);
     try {
       const profileData = await getProfessionalProfile();
-      if (profileData.profile) {
+      // Handle null profile (profile doesn't exist yet - user skipped setup)
+      // Clear error state since missing profile is expected for new users
+      if (profileData === null) {
+        setProfessionalProfile(null);
+        setDocuments([]);
+        setError(""); // Clear error - no profile is OK, not an error condition
+      } else if (profileData.profile) {
         setProfessionalProfile(profileData.profile);
         setDocuments(profileData.documents || []);
       } else {
@@ -286,7 +299,12 @@ const ProfessionalProfile: React.FC = () => {
         setDocuments([]);
       }
     } catch (e: any) {
-      setError("Failed to load professional profile");
+      // Only set error for non-404 errors
+      // 404 errors are handled gracefully by API function (returns null)
+      // so they don't need to be treated as errors here
+      if (!e.message || !e.message.includes("404")) {
+        setError("Failed to load professional profile");
+      }
       setProfessionalProfile(null);
       setDocuments([]);
     } finally {
@@ -607,7 +625,9 @@ const ProfessionalProfile: React.FC = () => {
 
       // Refresh profile
       const profileData = await getProfessionalProfile();
-      if (profileData.profile) {
+      if (profileData === null) {
+        setProfessionalProfile(null);
+      } else if (profileData.profile) {
         setProfessionalProfile(profileData.profile);
       }
 

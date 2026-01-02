@@ -216,27 +216,45 @@ const ProfessionalDashboard: React.FC = () => {
     }
   }, [searchParams]);
 
+  /**
+   * Fetches all dashboard data from the API
+   * 
+   * Retrieves professional profile, services, and promotional materials.
+   * Handles missing profiles gracefully - if profile doesn't exist (404 response),
+   * sets all data to empty/null values. This allows the dashboard to display
+   * properly even for users who haven't completed profile setup.
+   */
   const fetchData = async () => {
     setLoading(true);
     try {
       const profileData = await getProfessionalProfile();
-      setProfessionalProfile(profileData.profile || null);
+      // Handle null profile (profile doesn't exist yet - user skipped setup)
+      // Set all related data to empty/null to allow dashboard to display
+      if (profileData === null) {
+        setProfessionalProfile(null);
+        setServices([]);
+        setPromotionalMaterials([]);
+      } else {
+        setProfessionalProfile(profileData.profile || null);
 
-      if (profileData.profile) {
-        const servicesData = await getProfessionalServices();
-        setServices(servicesData || []);
+        if (profileData.profile) {
+          // Only fetch services and materials if profile exists
+          const servicesData = await getProfessionalServices();
+          setServices(servicesData || []);
 
-        // Only fetch promotional materials if profile exists
-        try {
-          const materials = await getPromotionalMaterials();
-          setPromotionalMaterials(materials || []);
-        } catch (e: any) {
-          // If no profile or error, set empty array
-          console.warn("Failed to load promotional materials:", e);
+          // Only fetch promotional materials if profile exists
+          try {
+            const materials = await getPromotionalMaterials();
+            setPromotionalMaterials(materials || []);
+          } catch (e: any) {
+            // If no profile or error, set empty array
+            console.warn("Failed to load promotional materials:", e);
+            setPromotionalMaterials([]);
+          }
+        } else {
+          setServices([]);
           setPromotionalMaterials([]);
         }
-      } else {
-        setPromotionalMaterials([]);
       }
     } catch (e: any) {
       console.error("Failed to load dashboard data:", e);

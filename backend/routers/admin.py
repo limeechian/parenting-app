@@ -58,7 +58,7 @@ class UserCreate(BaseModel):
     email: str
     password: str
     role: str
-    is_active: bool = True
+    is_active: Optional[bool] = True  # Optional, defaults to True for new internal team members
 
 class UserUpdate(BaseModel):
     email: Optional[str] = None
@@ -407,11 +407,12 @@ async def create_user(
         hashed_password = pwd_context.hash(user_data.password)
         
         # Create new user
+        # Internal team members are always active by default
         new_user = User(
             email=user_data.email,
             hashed_password=hashed_password,
             role=user_data.role,
-            is_active=user_data.is_active,
+            is_active=True,  # Always active for new internal team members
             is_verified=True,  # Internal team members are auto-verified
             updated_by=user.user_id
         )

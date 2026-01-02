@@ -170,6 +170,15 @@ export const googleSignIn = async (credential: string, email: string, role: 'par
   return res.json();
 };
 
+/**
+ * Fetches the parent user's profile from the API
+ * 
+ * Handles 404 responses gracefully by returning null when the profile doesn't exist yet.
+ * This allows the app to work for users who skipped the initial profile setup.
+ * 
+ * @returns {Promise<Object|null>} Parent profile object, or null if profile doesn't exist (404)
+ * @throws {Error} If the request fails for reasons other than 404
+ */
 export const getParentProfile = async () => {
   const token = localStorage.getItem('auth_token');
   const res = await makeRequest(`${API_BASE_URL}/api/profile/parent`, {
@@ -177,6 +186,11 @@ export const getParentProfile = async () => {
     credentials: 'include',
     headers: token ? { 'Authorization': `Bearer ${token}` } : {}
   });
+  // Handle 404 gracefully - profile doesn't exist yet (user skipped setup)
+  // Return null instead of throwing error to allow app to function without profile
+  if (res.status === 404) {
+    return null;
+  }
   if (!res.ok) throw new Error('Failed to fetch parent profile');
   return res.json();
 };
@@ -187,6 +201,15 @@ export const updateParentProfile = async (profile: any) => {
   return res.json();
 };
 
+/**
+ * Fetches all children profiles for the current parent user
+ * 
+ * Handles 404 responses gracefully by returning an empty array when no children exist yet.
+ * This prevents errors when users haven't added children to their profile.
+ * 
+ * @returns {Promise<Array>} Array of child profile objects, or empty array if none exist (404)
+ * @throws {Error} If the request fails for reasons other than 404
+ */
 export const getChildren = async () => {
   const token = localStorage.getItem('auth_token');
   const res = await makeRequest(`${API_BASE_URL}/api/profile/children`, {
@@ -194,10 +217,25 @@ export const getChildren = async () => {
     credentials: 'include',
     headers: token ? { 'Authorization': `Bearer ${token}` } : {}
   });
+  // Handle 404 gracefully - no children exist yet
+  // Return empty array instead of throwing error to allow app to function without children
+  if (res.status === 404) {
+    return [];
+  }
   if (!res.ok) throw new Error('Failed to fetch children');
   return res.json();
 };
 
+/**
+ * Fetches statistics for the parent user (children count, diary entries, etc.)
+ * 
+ * Handles 404 responses gracefully by returning default stats with all zeros when
+ * the profile doesn't exist yet. This allows the dashboard to display properly
+ * even for users who skipped profile setup.
+ * 
+ * @returns {Promise<Object>} Statistics object with counts, or default stats (all zeros) if profile doesn't exist (404)
+ * @throws {Error} If the request fails for reasons other than 404
+ */
 export const getParentStats = async () => {
   const token = localStorage.getItem('auth_token');
   const res = await makeRequest(`${API_BASE_URL}/api/profile/parent/stats`, {
@@ -205,10 +243,32 @@ export const getParentStats = async () => {
     credentials: 'include',
     headers: token ? { 'Authorization': `Bearer ${token}` } : {}
   });
+  // Handle 404 gracefully - no profile exists yet, return default stats
+  // Return zeros for all stats instead of throwing error to allow dashboard to display
+  if (res.status === 404) {
+    return {
+      children_count: 0,
+      conversations_count: 0,
+      diary_entries_count: 0,
+      communities_joined_count: 0,
+      resources_count: 0,
+      days_active: 0,
+    };
+  }
   if (!res.ok) throw new Error('Failed to fetch parent stats');
   return res.json();
 };
 
+/**
+ * Fetches recent activity feed for the parent user
+ * 
+ * Handles 404 responses gracefully by returning an empty activities array when
+ * the profile doesn't exist yet. This prevents errors on the dashboard for new users.
+ * 
+ * @param {number} limit - Maximum number of activities to return (default: 5)
+ * @returns {Promise<Object>} Object with 'activities' array, or empty array if profile doesn't exist (404)
+ * @throws {Error} If the request fails for reasons other than 404
+ */
 export const getParentRecentActivity = async (limit: number = 5) => {
   const token = localStorage.getItem('auth_token');
   const res = await makeRequest(`${API_BASE_URL}/api/profile/parent/recent-activity?limit=${limit}`, {
@@ -216,6 +276,11 @@ export const getParentRecentActivity = async (limit: number = 5) => {
     credentials: 'include',
     headers: token ? { 'Authorization': `Bearer ${token}` } : {}
   });
+  // Handle 404 gracefully - no profile exists yet, return empty activities
+  // Return empty array instead of throwing error to allow dashboard to display
+  if (res.status === 404) {
+    return { activities: [] };
+  }
   if (!res.ok) throw new Error('Failed to fetch recent activity');
   return res.json();
 };
@@ -420,11 +485,26 @@ export const resetPassword = async (token: string, password: string) => {
 };
 
 // Professional profile functions
+
+/**
+ * Fetches the professional user's profile from the API
+ * 
+ * Handles 404 responses gracefully by returning null when the profile doesn't exist yet.
+ * This allows the app to work for professional users who haven't completed their profile setup.
+ * 
+ * @returns {Promise<Object|null>} Professional profile object, or null if profile doesn't exist (404)
+ * @throws {Error} If the request fails for reasons other than 404
+ */
 export const getProfessionalProfile = async () => {
   const res = await makeRequest(`${API_BASE_URL}/api/profile/professional`, {
     mode: 'cors',
     credentials: 'include'
   });
+  // Handle 404 gracefully - profile doesn't exist yet
+  // Return null instead of throwing error to allow app to function without profile
+  if (res.status === 404) {
+    return null;
+  }
   if (!res.ok) throw new Error('Failed to fetch professional profile');
   return res.json();
 };

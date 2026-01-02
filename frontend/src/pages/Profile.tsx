@@ -497,22 +497,61 @@ const Profile: React.FC = () => {
     return "User";
   };
 
+  /**
+   * Effect hook to fetch and initialize profile data on component mount
+   * 
+   * Handles missing profiles gracefully - if user skipped setup (404 response),
+   * initializes with empty profile form instead of showing error.
+   * This allows users to fill in their profile even if they skipped initial setup.
+   */
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
         const parent = await getParentProfile();
-        setParentProfile(parent);
+        // Handle null profile (user skipped setup) - initialize with empty profile
+        // This allows the profile page to display an empty form ready for user input
+        if (parent === null) {
+          setParentProfile({
+            first_name: "",
+            last_name: "",
+            gender: "",
+            birthdate: "",
+            occupation: "",
+            education_level: "",
+            experience_level: "",
+            parenting_style: "",
+            preferred_communication_style: "",
+            family_structure: "",
+            relationship_status: "",
+            relationship_with_child: "",
+            address_line: "",
+            city: "",
+            state: "",
+            postcode: "",
+            country: "Malaysia",
+            profile_picture_url: undefined,
+          });
+        } else {
+          setParentProfile(parent);
+        }
 
         // Get email from localStorage and set display name with fallback logic
+        // If no profile exists, displayName will use email prefix (before @)
         const userEmail = localStorage.getItem("userEmail") || "";
-        const displayNameValue = getDisplayName(parent, userEmail);
+        const displayNameValue = getDisplayName(parent || {}, userEmail);
         setDisplayName(displayNameValue);
 
+        // Fetch children - returns empty array if none exist (404 handled by API)
         const kids = await getChildren();
-        setChildren(kids);
+        setChildren(kids || []);
       } catch (e: any) {
-        setError("Failed to load profile");
+        // Only set error for non-404 errors
+        // 404 errors are handled gracefully by API functions (return null/empty arrays)
+        // so they don't need to be treated as errors here
+        if (!e.message || !e.message.includes("404")) {
+          setError("Failed to load profile");
+        }
       } finally {
         setLoading(false);
       }
