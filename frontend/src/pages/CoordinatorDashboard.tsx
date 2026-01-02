@@ -2812,11 +2812,11 @@ const CoordinatorDashboard: React.FC = () => {
 
             return (
               <div
-                className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4"
+                className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-0 sm:p-4"
                 onClick={() => setShowProfileDetailModal(false)}
               >
                 <div
-                  className="rounded-lg sm:rounded-xl max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto flex flex-col"
+                  className="rounded-none sm:rounded-xl max-w-4xl w-full h-full sm:h-auto sm:max-h-[90vh] overflow-y-auto flex flex-col"
                   style={{
                     backgroundColor: "#F5F5F5",
                     border: "1px solid #AA855B",
@@ -3916,13 +3916,19 @@ const CoordinatorDashboard: React.FC = () => {
           onClose={() => setShowPromotionEditModal(false)}
           maxWidth="sm"
           fullWidth
+          disableScrollLock={true}
           PaperProps={{
             sx: {
-              borderRadius: { xs: "16px", sm: "16px", md: "20px" },
+              borderRadius: { xs: "0", sm: "16px", md: "20px" },
               boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
               border: "1px solid #AA855B",
-              margin: { xs: "16px", sm: "24px" },
-              maxWidth: { xs: "calc(100% - 32px)", sm: "500px" },
+              margin: { xs: "0", sm: "24px" },
+              maxWidth: { xs: "100%", sm: "500px" },
+              width: { xs: "100%", sm: "auto" },
+              height: { xs: "100vh", sm: "auto" },
+              maxHeight: { xs: "100vh", sm: "90vh" },
+              display: "flex",
+              flexDirection: "column",
             },
           }}
         >
@@ -3938,6 +3944,7 @@ const CoordinatorDashboard: React.FC = () => {
               justifyContent: "space-between",
               alignItems: "center",
               padding: { xs: "12px 16px", sm: "16px 24px" },
+              flexShrink: 0,
             }}
           >
             <span>Edit Display Settings</span>
@@ -3953,6 +3960,9 @@ const CoordinatorDashboard: React.FC = () => {
             sx={{
               padding: { xs: "16px", sm: "24px" },
               backgroundColor: "#F5F5F5",
+              flex: "1 1 auto",
+              overflowY: "auto",
+              minHeight: 0,
             }}
           >
             <div className="space-y-4 mt-2">
@@ -4093,6 +4103,7 @@ const CoordinatorDashboard: React.FC = () => {
               backgroundColor: "#FAEFE2",
               borderTop: "1px solid #AA855B",
               gap: "8px",
+              flexShrink: 0,
               flexDirection: { xs: "column-reverse", sm: "row" },
             }}
           >
@@ -4151,13 +4162,19 @@ const CoordinatorDashboard: React.FC = () => {
           onClose={() => setShowEditSpecializationsModal(false)}
           maxWidth="md"
           fullWidth
+          disableScrollLock={true}
           PaperProps={{
             sx: {
-              borderRadius: { xs: "16px", sm: "16px", md: "20px" },
+              borderRadius: { xs: "0", sm: "16px", md: "20px" },
               boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
               border: "1px solid #AA855B",
-              margin: { xs: "16px", sm: "24px" },
-              maxWidth: { xs: "calc(100% - 32px)", sm: "600px", md: "700px" },
+              margin: { xs: "0", sm: "24px" },
+              maxWidth: { xs: "100%", sm: "600px", md: "700px" },
+              width: { xs: "100%", sm: "auto" },
+              height: { xs: "100vh", sm: "auto" },
+              maxHeight: { xs: "100vh", sm: "90vh" },
+              display: "flex",
+              flexDirection: "column",
             },
           }}
         >
@@ -4173,6 +4190,7 @@ const CoordinatorDashboard: React.FC = () => {
               justifyContent: "space-between",
               alignItems: "center",
               padding: { xs: "12px 16px", sm: "16px 24px" },
+              flexShrink: 0,
             }}
           >
             <span>Edit Specializations</span>
@@ -4197,6 +4215,9 @@ const CoordinatorDashboard: React.FC = () => {
             sx={{
               padding: { xs: "16px", sm: "20px", md: "24px" },
               backgroundColor: "#F5F5F5",
+              flex: "1 1 auto",
+              overflowY: "auto",
+              minHeight: 0,
             }}
           >
             <div className="mt-2 sm:mt-4">
@@ -4348,6 +4369,7 @@ const CoordinatorDashboard: React.FC = () => {
               backgroundColor: "#FAEFE2",
               borderTop: "1px solid #AA855B",
               gap: "8px",
+              flexShrink: 0,
               flexDirection: { xs: "column-reverse", sm: "row" },
             }}
           >

@@ -937,22 +937,20 @@ const LandingPage: React.FC = () => {
               </h3>
               <ul className="space-y-1.5 sm:space-y-2">
                 <li>
-                  <Link
-                    to="/features"
-                    className="transition-colors hover:text-white text-xs sm:text-sm"
+                  <span
+                    className="transition-colors hover:text-white text-xs sm:text-sm cursor-default"
                     style={{ color: "#AA855B" }}
                   >
                     Features
-                  </Link>
+                  </span>
                 </li>
                 <li>
-                  <Link
-                    to="/pricing"
-                    className="transition-colors hover:text-white text-xs sm:text-sm"
+                  <span
+                    className="transition-colors hover:text-white text-xs sm:text-sm cursor-default"
                     style={{ color: "#AA855B" }}
                   >
                     Pricing
-                  </Link>
+                  </span>
                 </li>
               </ul>
             </div>
@@ -963,22 +961,20 @@ const LandingPage: React.FC = () => {
               </h3>
               <ul className="space-y-1.5 sm:space-y-2">
                 <li>
-                  <Link
-                    to="/about"
-                    className="transition-colors hover:text-white text-xs sm:text-sm"
+                  <span
+                    className="transition-colors hover:text-white text-xs sm:text-sm cursor-default"
                     style={{ color: "#AA855B" }}
                   >
                     About Us
-                  </Link>
+                  </span>
                 </li>
                 <li>
-                  <Link
-                    to="/contact"
-                    className="transition-colors hover:text-white text-xs sm:text-sm"
+                  <span
+                    className="transition-colors hover:text-white text-xs sm:text-sm cursor-default"
                     style={{ color: "#AA855B" }}
                   >
                     Contact Us
-                  </Link>
+                  </span>
                 </li>
               </ul>
             </div>
@@ -992,20 +988,18 @@ const LandingPage: React.FC = () => {
               © 2025 ParenZing. All rights reserved.
             </p>
             <div className="flex space-x-4 sm:space-x-6 mt-3 sm:mt-4 md:mt-0">
-              <Link
-                to="/privacy"
-                className="text-xs sm:text-sm transition-colors"
+              <span
+                className="text-xs sm:text-sm transition-colors cursor-default"
                 style={{ color: "#AA855B" }}
               >
                 Privacy Policy
-              </Link>
-              <Link
-                to="/terms"
-                className="text-xs sm:text-sm transition-colors"
+              </span>
+              <span
+                className="text-xs sm:text-sm transition-colors cursor-default"
                 style={{ color: "#AA855B" }}
               >
                 Terms of Service
-              </Link>
+              </span>
             </div>
           </div>
         </div>

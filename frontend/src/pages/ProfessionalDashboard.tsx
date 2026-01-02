@@ -1869,13 +1869,19 @@ const ProfessionalDashboard: React.FC = () => {
           onClose={closeServiceModal}
           maxWidth="md"
           fullWidth
+          disableScrollLock={true}
           PaperProps={{
             sx: {
-              borderRadius: { xs: "16px", sm: "16px", md: "20px" },
+              borderRadius: { xs: "0", sm: "16px", md: "20px" },
               boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
               border: "1px solid #AA855B",
-              margin: { xs: "16px", sm: "24px" },
-              maxWidth: { xs: "calc(100% - 32px)", sm: "600px", md: "700px" },
+              margin: { xs: "0", sm: "24px" },
+              width: { xs: "100%", sm: "auto" },
+              maxWidth: { xs: "100%", sm: "600px", md: "700px" },
+              height: { xs: "100vh", sm: "auto" },
+              maxHeight: { xs: "100vh", sm: "90vh" },
+              display: "flex",
+              flexDirection: "column",
             },
           }}
         >
@@ -1891,6 +1897,7 @@ const ProfessionalDashboard: React.FC = () => {
               justifyContent: "space-between",
               alignItems: "center",
               padding: { xs: "12px 16px", sm: "16px 24px" },
+              flexShrink: 0,
             }}
           >
             <div className="flex items-center">
@@ -1919,6 +1926,9 @@ const ProfessionalDashboard: React.FC = () => {
             sx={{
               padding: { xs: "16px", sm: "20px", md: "24px" },
               backgroundColor: "#F5F5F5",
+              flex: "1 1 auto",
+              overflowY: "auto",
+              minHeight: 0,
             }}
           >
             <div className="space-y-4 mt-4">
@@ -2062,6 +2072,7 @@ const ProfessionalDashboard: React.FC = () => {
               backgroundColor: "#FAEFE2",
               borderTop: "1px solid #AA855B",
               gap: "8px",
+              flexShrink: 0,
               flexDirection: { xs: "column-reverse", sm: "row" },
             }}
           >
@@ -2099,13 +2110,19 @@ const ProfessionalDashboard: React.FC = () => {
           onClose={closePromoModal}
           maxWidth="md"
           fullWidth
+          disableScrollLock={true}
           PaperProps={{
             sx: {
-              borderRadius: { xs: "16px", sm: "16px", md: "20px" },
+              borderRadius: { xs: "0", sm: "16px", md: "20px" },
               boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
               border: "1px solid #AA855B",
-              margin: { xs: "16px", sm: "24px" },
-              maxWidth: { xs: "calc(100% - 32px)", sm: "600px", md: "700px" },
+              margin: { xs: "0", sm: "24px" },
+              width: { xs: "100%", sm: "auto" },
+              maxWidth: { xs: "100%", sm: "600px", md: "700px" },
+              height: { xs: "100vh", sm: "auto" },
+              maxHeight: { xs: "100vh", sm: "90vh" },
+              display: "flex",
+              flexDirection: "column",
             },
           }}
         >
@@ -2121,6 +2138,7 @@ const ProfessionalDashboard: React.FC = () => {
               justifyContent: "space-between",
               alignItems: "center",
               padding: { xs: "12px 16px", sm: "16px 24px" },
+              flexShrink: 0,
             }}
           >
             <div className="flex items-center">
@@ -2149,6 +2167,9 @@ const ProfessionalDashboard: React.FC = () => {
             sx={{
               padding: { xs: "16px", sm: "20px", md: "24px" },
               backgroundColor: "#F5F5F5",
+              flex: "1 1 auto",
+              overflowY: "auto",
+              minHeight: 0,
             }}
           >
             <div className="space-y-4 mt-4">
@@ -2401,6 +2422,7 @@ const ProfessionalDashboard: React.FC = () => {
               backgroundColor: "#FAEFE2",
               borderTop: "1px solid #AA855B",
               gap: "8px",
+              flexShrink: 0,
               flexDirection: { xs: "column-reverse", sm: "row" },
             }}
           >

@@ -1391,7 +1391,7 @@ const ProfessionalDirectoryPage: React.FC = () => {
 
     return (
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4"
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-0 sm:p-4"
         onClick={() => {
           setSelectedProfessional(null);
           if (id) {
@@ -1400,7 +1400,7 @@ const ProfessionalDirectoryPage: React.FC = () => {
         }}
       >
         <div
-          className="rounded-lg sm:rounded-xl max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto flex flex-col"
+          className="rounded-none sm:rounded-xl max-w-4xl w-full h-full sm:h-auto sm:max-h-[90vh] overflow-y-auto flex flex-col"
           style={{
             backgroundColor: "#F5F5F5",
             border: "1px solid #AA855B",

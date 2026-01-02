@@ -334,21 +334,19 @@ const SignupPage: React.FC = () => {
                         style={{ color: "#32332D" }}
                       >
                         I agree to the{" "}
-                        <a
-                          href="/terms"
-                          className="font-semibold transition-colors"
+                        <span
+                          className="font-semibold transition-colors cursor-default"
                           style={{ color: "#F2742C" }}
                         >
                           Terms of Service
-                        </a>{" "}
+                        </span>{" "}
                         and{" "}
-                        <a
-                          href="/privacy"
-                          className="font-semibold transition-colors"
+                        <span
+                          className="font-semibold transition-colors cursor-default"
                           style={{ color: "#F2742C" }}
                         >
                           Privacy Policy
-                        </a>
+                        </span>
                       </span>
                     }
                   />

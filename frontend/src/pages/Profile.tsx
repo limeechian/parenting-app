@@ -1447,15 +1447,16 @@ const Profile: React.FC = () => {
         disableScrollLock={true}
         PaperProps={{
           sx: {
-            borderRadius: "16px",
+            borderRadius: { xs: "0", sm: "16px" },
             boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
             border: "1px solid #AA855B",
             overflow: "hidden",
             display: "flex",
             flexDirection: "column",
-            height: { xs: "90vh", sm: "85vh" },
-            maxHeight: { xs: "90vh", sm: "700px" },
-            margin: { xs: "8px", sm: "16px" },
+            height: { xs: "100vh", sm: "85vh" },
+            maxHeight: { xs: "100vh", sm: "700px" },
+            margin: { xs: "0", sm: "16px" },
+            width: { xs: "100%", sm: "auto" },
           },
         }}
       >
@@ -2360,13 +2361,19 @@ const Profile: React.FC = () => {
         onClose={() => setChildDialogOpen(false)}
         maxWidth="md"
         fullWidth
+        disableScrollLock={true}
         PaperProps={{
           sx: {
-            borderRadius: "16px",
+            borderRadius: { xs: "0", sm: "16px" },
             boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
             border: "1px solid #AA855B",
-            maxHeight: { xs: "90vh", sm: "85vh" },
+            height: { xs: "100vh", sm: "85vh" },
+            maxHeight: { xs: "100vh", sm: "85vh" },
+            margin: { xs: "0", sm: "16px" },
+            width: { xs: "100%", sm: "auto" },
             overflow: "auto",
+            display: "flex",
+            flexDirection: "column",
           },
         }}
       >
@@ -2405,6 +2412,9 @@ const Profile: React.FC = () => {
           sx={{
             padding: { xs: "16px", sm: "20px", md: "24px" },
             backgroundColor: "#F5F5F5",
+            flex: "1 1 auto",
+            overflowY: "auto",
+            minHeight: 0,
           }}
         >
           <form className="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-4 mt-2 sm:mt-4">
@@ -3076,6 +3086,7 @@ const Profile: React.FC = () => {
             backgroundColor: "#FAEFE2",
             borderTop: "1px solid #AA855B",
             gap: "8px",
+            flexShrink: 0,
             flexDirection: { xs: "column-reverse", sm: "row" },
           }}
         >

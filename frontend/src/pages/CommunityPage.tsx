@@ -6603,12 +6603,11 @@ const CommunityPage: React.FC = () => {
       return null;
     }
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-0 sm:p-4">
         <div
-          className="max-w-4xl w-full max-h-[90vh] flex flex-col"
+          className="max-w-4xl w-full h-full sm:h-auto sm:max-h-[90vh] flex flex-col rounded-none sm:rounded-2xl"
           style={{
             backgroundColor: "#F5F5F5",
-            borderRadius: "16px",
             overflow: "hidden",
           }}
         >
@@ -7467,12 +7466,11 @@ const CommunityPage: React.FC = () => {
     }
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-0 sm:p-4">
         <div
-          className="max-w-4xl w-full max-h-[90vh] flex flex-col"
+          className="max-w-4xl w-full h-full sm:h-auto sm:max-h-[90vh] flex flex-col rounded-none sm:rounded-2xl"
           style={{
             backgroundColor: "#F5F5F5",
-            borderRadius: "16px",
             overflow: "hidden",
           }}
         >
@@ -9094,12 +9092,11 @@ const CommunityPage: React.FC = () => {
     }
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-0 sm:p-4">
         <div
-          className="max-w-4xl w-full max-h-[90vh] flex flex-col"
+          className="max-w-4xl w-full h-full sm:h-auto sm:max-h-[90vh] flex flex-col rounded-none sm:rounded-2xl"
           style={{
             backgroundColor: "#F5F5F5",
-            borderRadius: "16px",
             overflow: "hidden",
           }}
         >
