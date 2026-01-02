@@ -1,3 +1,9 @@
+// Programmer Name: Ms. Lim Ee Chian, APD3F2505SE, Software Engineering Student, Bachelor of Science (Hons) in Software Engineering
+// Program Name: firebase.js
+// Description: To initialize Firebase configuration and provide Google authentication functionality
+// First Written on: Monday, 06-Oct-2025
+// Edited on: Sunday, 10-Dec-2025
+
 // Firebase configuration using environment variables
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";

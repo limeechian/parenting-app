@@ -1,3 +1,9 @@
+// Programmer Name: Ms. Lim Ee Chian, APD3F2505SE, Software Engineering Student, Bachelor of Science (Hons) in Software Engineering
+// Program Name: firebase.template.js
+// Description: To provide template file for Firebase configuration setup
+// First Written on: Monday, 06-Oct-2025
+// Edited on: Sunday, 10-Dec-2025
+
 // Firebase configuration template
 // Replace with your Firebase config from Firebase Console
 import { initializeApp } from "firebase/app";

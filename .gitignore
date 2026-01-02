@@ -10,7 +10,16 @@ __pycache__/
 *$py.class
 *.so
 .Python
+
+# Project-specific exclusions
+MOCKDATA/
+NOTES/
 build/
+
+# Documentation - exclude all .md files except README.md
+*.md
+!README.md
+!**/README.md
 develop-eggs/
 dist/
 downloads/

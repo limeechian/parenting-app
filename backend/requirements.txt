@@ -1,3 +1,9 @@
+# Programmer Name: Ms. Lim Ee Chian, APD3F2505SE, Software Engineering Student, Bachelor of Science (Hons) in Software Engineering
+# Program Name: requirements.txt
+# Description: To list all Python package dependencies required for the backend application
+# First Written on: Monday, 29-Sep-2025
+# Edited on: Sunday, 10-Dec-2025
+
 fastapi==0.115.9
 uvicorn[standard]==0.32.1
 sqlalchemy==2.0.41
@@ -19,4 +25,5 @@ openai>=1.70.0
 numpy==1.26.4
 google-auth==2.40.3
 requests==2.32.3
-mangum==0.17.0 
+mangum==0.17.0
+supabase==2.0.0 

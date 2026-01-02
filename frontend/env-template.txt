@@ -7,4 +7,8 @@ REACT_APP_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
 REACT_APP_FIREBASE_PROJECT_ID=your-project-id
 REACT_APP_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
 REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
-REACT_APP_FIREBASE_APP_ID=your-app-id 
+REACT_APP_FIREBASE_APP_ID=your-app-id
+
+# Supabase Configuration (for Profile Picture Upload)
+REACT_APP_SUPABASE_URL=https://parenting-app-database.supabase.co
+REACT_APP_SUPABASE_ANON_KEY=your-supabase-anon-key 

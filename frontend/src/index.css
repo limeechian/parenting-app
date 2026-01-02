@@ -1,6 +1,135 @@
+/* Programmer Name: Ms. Lim Ee Chian, APD3F2505SE, Software Engineering Student, Bachelor of Science (Hons) in Software Engineering */
+/* Program Name: index.css */
+/* Description: To define global CSS styles and Tailwind CSS configuration */
+/* First Written on: Monday, 29-Sep-2025 */
+/* Edited on: Sunday, 10-Dec-2025 */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom dropdown styling to override browser defaults */
+select.custom-select option:hover {
+  background-color: #D4C4A8 !important;
+  color: #32332D !important;
+}
+
+select.custom-select option:checked,
+select.custom-select option[selected] {
+  background-color: #AA855B !important;
+  color: #FFFFFF !important;
+}
+
+select.custom-select option {
+  background-color: #FFFFFF !important;
+  color: #32332D !important;
+}
+
+/* Global override for all select elements */
+select option:hover {
+  background-color: #D4C4A8 !important;
+  color: #32332D !important;
+}
+
+select option:checked,
+select option[selected] {
+  background-color: #AA855B !important;
+  color: #FFFFFF !important;
+}
+
+/* Force override for all elements */
+* option:hover {
+  background-color: #D4C4A8 !important;
+  color: #32332D !important;
+}
+
+* option:checked,
+* option[selected] {
+  background-color: #AA855B !important;
+  color: #FFFFFF !important;
+}
+
+/* Ultra-specific override for browser defaults */
+html body div select option:hover {
+  background-color: #D4C4A8 !important;
+  color: #32332D !important;
+}
+
+html body div select option:checked,
+html body div select option[selected] {
+  background-color: #AA855B !important;
+  color: #FFFFFF !important;
+}
+
+/* Override browser default select styling */
+select {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+select option {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+/* Nuclear option - try to override browser defaults with maximum specificity */
+html body div[class*="DiaryPage"] select option:hover,
+html body div[class*="DiaryPage"] select option:focus,
+html body div[class*="DiaryPage"] select option:active {
+  background-color: #D4C4A8 !important;
+  color: #32332D !important;
+  background: #D4C4A8 !important;
+}
+
+html body div[class*="DiaryPage"] select option:checked,
+html body div[class*="DiaryPage"] select option[selected] {
+  background-color: #AA855B !important;
+  color: #FFFFFF !important;
+  background: #AA855B !important;
+}
+
+/* Try to override with even more specificity */
+div[class*="DiaryPage"] select option:hover {
+  background-color: #D4C4A8 !important;
+  color: #32332D !important;
+  background: #D4C4A8 !important;
+}
+
+div[class*="DiaryPage"] select option:checked,
+div[class*="DiaryPage"] select option[selected] {
+  background-color: #AA855B !important;
+  color: #FFFFFF !important;
+  background: #AA855B !important;
+}
+
+/* Force border color reset for select elements */
+select.custom-select {
+  border-color: #AA855B !important;
+}
+
+select.custom-select:focus {
+  border-color: #32332D !important;
+}
+
+/* Ensure border colors are properly reset */
+select.custom-select:not(:focus) {
+  border-color: #AA855B !important;
+  box-shadow: none !important;
+}
+
+/* Override any potential focus states that might be stuck */
+select.custom-select:not(:focus):not(:active) {
+  border-color: #AA855B !important;
+  box-shadow: none !important;
+  border-width: 1px !important;
+}
+
+/* Force reset for any select that might be stuck */
+select.custom-select[style*="border-color"] {
+  border-color: #AA855B !important;
+}
 
 
 /*

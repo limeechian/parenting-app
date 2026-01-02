@@ -1,3 +1,9 @@
+REM Programmer Name: Ms. Lim Ee Chian, APD3F2505SE, Software Engineering Student, Bachelor of Science (Hons) in Software Engineering
+REM Program Name: setup-iam-roles.bat
+REM Description: To set up IAM roles required for ECS task execution and task roles
+REM First Written on: Monday, 29-Sep-2025
+REM Edited on: Sunday, 10-Dec-2025
+
 @echo off
 echo Setting up IAM roles for ECS deployment...
 

@@ -1,9 +1,35 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { TextField, Button, Checkbox, FormControlLabel, InputAdornment, IconButton, CircularProgress, Radio, RadioGroup, FormControl } from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { signInWithGoogle } from '../firebase';
-import { Users, Shield, ArrowRight, Heart, Star } from 'lucide-react';
+// Programmer Name: Ms. Lim Ee Chian, APD3F2505SE, Software Engineering Student, Bachelor of Science (Hons) in Software Engineering
+// Program Name: SignupPage.tsx
+// Description: To provide user registration interface for parent users to create accounts
+// First Written on: Tuesday, 30-Sep-2025
+// Edited on: Sunday, 10-Dec-2025
+
+// Import React hooks for component state management
+import React, { useState } from "react";
+// Import React Router hooks for navigation
+import { useNavigate, Link, useLocation } from "react-router-dom";
+// Import Material-UI components for form elements
+import {
+  TextField,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  InputAdornment,
+  IconButton,
+  CircularProgress,
+} from "@mui/material";
+// Import Material-UI icons for password visibility toggle
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+// Import lucide-react icons for decorative elements
+import { Shield, ArrowRight, Heart } from "lucide-react";
+// Import toast notification components
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+// Import Poppins font weights for consistent typography
+import "@fontsource/poppins/400.css";
+import "@fontsource/poppins/500.css";
+import "@fontsource/poppins/600.css";
+import "@fontsource/poppins/700.css";
 
 //const API_BASE_URL = 'http://localhost:8000';
 //const API_BASE_URL = 'https://5e0em7cm60.execute-api.ap-southeast-2.amazonaws.com/prod';
@@ -14,439 +40,470 @@ import { Users, Shield, ArrowRight, Heart, Star } from 'lucide-react';
 //const API_BASE_URL = 'https://parenting-app-alb-1579687963.ap-southeast-2.elb.amazonaws.com';
 //const API_BASE_URL = 'https://parenzing.com';
 //import { API_BASE_URL } from '../config/api';
-import { sendSignup, googleSignIn, sendLogin } from '../services/api';
+// Import API functions for user registration
+import { sendSignup, googleSignIn } from "../services/api";
+// Import Google sign-in button component
+import GoogleSignInButton from "../components/GoogleSignInButton";
 
+/**
+ * SignupPage Component
+ *
+ * Provides user registration interface for parent users to create accounts.
+ * Features include:
+ * - Email/password registration form
+ * - Password confirmation validation
+ * - Terms and conditions acceptance
+ * - Google sign-in option
+ * - Form validation and error handling
+ *
+ * @returns JSX element representing the signup page
+ */
 const SignupPage: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
-  const [role, setRole] = useState<'parent' | 'professional'>('parent');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [acceptTerms, setAcceptTerms] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  // Form state management
+  const [email, setEmail] = useState(""); // User's email address
+  const [password, setPassword] = useState(""); // User's password
+  const [confirmPassword, setConfirmPassword] = useState(""); // Password confirmation
+  const [acceptTerms, setAcceptTerms] = useState(false); // Terms acceptance checkbox
+  const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
+  const [error, setError] = useState(""); // Error message to display
+  const [loading, setLoading] = useState(false); // Loading state during registration
 
-  // No auto-authentication - user must click the button manually
+  // React Router hooks
+  const navigate = useNavigate(); // Navigation function for programmatic routing
+  const location = useLocation(); // Current route location
 
+  /**
+   * Returns Material-UI TextField styling configuration
+   * Includes autofill styling overrides to match application theme
+   *
+   * @param hasValue - Whether the text field has a value (affects background color)
+   * @returns Material-UI sx prop styling object
+   */
+  const getTextFieldStyles = (hasValue: boolean) => ({
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "12px",
+      backgroundColor: hasValue ? "#F5F5F5" : "#EDEDED",
+      fontFamily: "'Poppins', sans-serif",
+      "&:hover": {
+        backgroundColor: "#F5F5F5",
+      },
+      "&.Mui-focused": {
+        backgroundColor: "#F5F5F5",
+        boxShadow: "0 0 0 2px #F2742C",
+      },
+      // Override browser autofill styling
+      "& input:-webkit-autofill": {
+        WebkitBoxShadow: "0 0 0 1000px #F5F5F5 inset !important",
+        WebkitTextFillColor: "#32332D !important",
+        transition: "background-color 5000s ease-in-out 0s",
+      },
+      "& input:-webkit-autofill:hover": {
+        WebkitBoxShadow: "0 0 0 1000px #F5F5F5 inset !important",
+      },
+      "& input:-webkit-autofill:focus": {
+        WebkitBoxShadow: "0 0 0 1000px #F5F5F5 inset !important",
+      },
+    },
+    "& .MuiInputLabel-root": {
+      color: "#32332D",
+      fontWeight: 500,
+      fontFamily: "'Poppins', sans-serif",
+      fontSize: { xs: "12px", sm: "13px" },
+    },
+    "& .MuiInputBase-input": {
+      fontSize: { xs: "12px", sm: "13px" },
+    },
+  });
+
+  /**
+   * Handles form submission for user registration
+   * Validates form data, creates new user account, and redirects to profile setup
+   *
+   * @param e - Form submission event
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) {
-      setError('Email is required');
-      return;
-    }
-    if (!username) {
-      setError('Username is required');
+      setError("Email is required");
       return;
     }
     if (!password) {
-      setError('Password is required');
+      setError("Password is required");
       return;
     }
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return;
     }
     if (!acceptTerms) {
-      setError('You must accept the terms');
+      // Show toast notification for terms acceptance
+      toast.warning(
+        "Please accept our Terms of Service and Privacy Policy to continue",
+        {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          style: {
+            fontFamily: "'Poppins', sans-serif",
+            fontSize: "14px",
+            backgroundColor: "#F2742C",
+            color: "#F5F5F5",
+            borderRadius: "8px",
+          },
+        },
+      );
+      setError("You must accept the terms");
       return;
     }
-    setError('');
+    setError("");
     setLoading(true);
     try {
-      // Use centralized API service
-      await sendSignup({ email, password, username, role });
-      
-      // Store user email for profile setup
-      localStorage.setItem('userEmail', email);
-      
-      // Auto-login after successful registration using centralized API service
-      try {
-        const loginData = await sendLogin({ identifier: email, password: password });
-        console.log('Auto-login successful:', loginData);
-        navigate('/setup-profile');
-      } catch (loginErr) {
-        console.error('Auto-login failed:', loginErr);
-        setError('Signup succeeded, but auto-login failed. Please log in manually.');
-      }
+      // Use centralized API service - always 'parent' role for this page
+      await sendSignup({ email, password, role: "parent" });
+
+      // Store user email for email verification page
+      localStorage.setItem("userEmail", email);
+
+      // Redirect to email verification page instead of auto-login
+      navigate("/email-verification", { state: { email } });
     } catch (err: any) {
-      console.error('Signup error:', err);
-      setError(err.message || 'Signup failed');
+      console.error("Signup error:", err);
+      setError(err.message || "Signup failed");
     } finally {
       setLoading(false);
     }
   };
 
-  // Google sign-in handler
-  const handleGoogleSignIn = async () => {
-    setError('');
+  // Google sign-in success handler
+  const handleGoogleSuccess = async (idToken: string) => {
+    setError("");
     setLoading(true);
     try {
-      console.log('Starting Google sign-in...');
-      const result = await signInWithGoogle();
-      
-      console.log('Firebase sign-in successful:', result.user.email);
-      
-      const idToken = await result.user.getIdToken();
-      localStorage.setItem('userEmail', result.user.email || '');
-      
-      console.log('Calling backend API...');
-      const data = await googleSignIn(idToken, result.user.email || '');
-      console.log('Backend response:', data);
-      
-      if (!data.profileComplete) {
+      // Decode token to get email
+      const payload = JSON.parse(atob(idToken.split(".")[1]));
+      const email = payload.email;
+
+      localStorage.setItem("userEmail", email);
+
+      console.log("Calling backend API...");
+      const data = await googleSignIn(idToken, email);
+      console.log("Backend response:", data);
+
+      // Store token if provided
+      if (data.access_token) {
+        localStorage.setItem("auth_token", data.access_token);
+      }
+
+      // Check for return URL
+      const returnUrl =
+        (location.state as any)?.returnUrl || localStorage.getItem("returnUrl");
+      if (returnUrl) {
+        localStorage.removeItem("returnUrl");
+        navigate(returnUrl);
+      } else if (data.isFirstLogin) {
+        console.log("First login detected, redirecting to setup profile");
         navigate("/setup-profile");
       } else {
+        console.log("Returning user, redirecting to dashboard");
         navigate("/parent-dashboard");
       }
     } catch (error: any) {
-      console.error('Google sign-in error:', error);
+      console.error("Google sign-in error:", error);
       setError(error.message || "Google sign-in failed");
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F5F5DC] via-white to-[#F4C2C2] p-4">
-      <div className="w-full max-w-lg">
-        {/* Header Section */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-[#9CAF88] to-[#8B4513] rounded-2xl mb-4 shadow-lg">
-            <Users className="w-10 h-10 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-[#8B4513] mb-2 font-['Inter']">Join Our Community</h1>
-          <p className="text-[#6B8CAE] text-lg">Start your parenting journey with expert guidance</p>
-        </div>
+  // Google sign-in error handler
+  const handleGoogleError = (error: string) => {
+    console.error("Google sign-in error:", error);
+    setError(
+      "Google sign-in failed. Please try again or use email/password signup.",
+    );
+  };
 
-        {/* Main Card */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Role Selection */}
-            <div className="bg-[#F5F5DC] rounded-xl p-6">
-              <div className="flex items-center mb-4">
-                <Star className="w-5 h-5 text-[#8B4513] mr-2" />
-                <h3 className="text-lg font-semibold text-[#8B4513]">I am a...</h3>
-              </div>
-              <FormControl component="fieldset" className="w-full">
-                <RadioGroup
-                  row
-                  value={role}
-                  onChange={e => setRole(e.target.value as any)}
-                  name="role"
-                  className="space-x-6"
+  return (
+    <div
+      className="min-h-screen flex items-center justify-center p-3 sm:p-4 md:p-6"
+      style={{ backgroundColor: "#F5EFED" }}
+    >
+      {/* Main Split Card */}
+      <div className="w-full max-w-4xl">
+        <div
+          className="rounded-2xl sm:rounded-3xl shadow-xl transition-all duration-300 hover:shadow-2xl overflow-hidden"
+          style={{ border: "1px solid #AA855B" }}
+        >
+          <div className="grid md:grid-cols-2 min-h-[400px] sm:min-h-[480px] md:min-h-[520px]">
+            {/* LEFT SIDE - Form Section */}
+            <div
+              className="p-4 sm:p-5 md:p-6 lg:p-7 flex flex-col justify-center"
+              style={{ backgroundColor: "#F5F5F5" }}
+            >
+              {/* Header - Visible on all screens */}
+              <div className="text-center mb-3 sm:mb-4">
+                <h1
+                  className="text-xl sm:text-2xl font-bold mb-1 sm:mb-1.5 font-['Poppins']"
+                  style={{ color: "#32332D" }}
                 >
-                  <FormControlLabel 
-                    value="parent" 
+                  Join Our Community
+                </h1>
+                <p
+                  className="text-[10px] sm:text-xs"
+                  style={{ color: "#32332D" }}
+                >
+                  Start your parenting journey with expert guidance
+                </p>
+              </div>
+              <form
+                onSubmit={handleSubmit}
+                className="space-y-2.5 sm:space-y-3 md:space-y-3.5"
+              >
+                {/* Form Fields */}
+                <div className="space-y-2.5 sm:space-y-3">
+                  <TextField
+                    label="Email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    fullWidth
+                    required
+                    sx={getTextFieldStyles(!!email)}
+                  />
+
+                  <TextField
+                    label="Password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    fullWidth
+                    required
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => setShowPassword(!showPassword)}
+                            sx={{
+                              color: "#32332D",
+                              fontFamily: "'Poppins', sans-serif",
+                            }}
+                          >
+                            {showPassword ? <Visibility /> : <VisibilityOff />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={getTextFieldStyles(!!password)}
+                  />
+
+                  <TextField
+                    label="Confirm Password"
+                    type={showPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    fullWidth
+                    required
+                    sx={getTextFieldStyles(!!confirmPassword)}
+                  />
+                </div>
+
+                {/* Terms and Conditions */}
+                <div style={{ marginTop: "6px" }} className="sm:mt-2">
+                  <FormControlLabel
                     control={
-                      <Radio 
+                      <Checkbox
+                        size="small"
+                        checked={acceptTerms}
+                        onChange={(e) => setAcceptTerms(e.target.checked)}
                         sx={{
-                          color: '#9CAF88',
-                          '&.Mui-checked': {
-                            color: '#722F37',
+                          color: "#AA855B",
+                          fontFamily: "'Poppins', sans-serif",
+                          "&.Mui-checked": {
+                            color: "#F2742C",
                           },
                         }}
                       />
-                    } 
+                    }
+                    sx={{ fontFamily: "'Poppins', sans-serif" }}
                     label={
-                      <span className="text-[#8B4513] font-medium">Parent/Caregiver</span>
+                      <span
+                        className="text-[10px] sm:text-xs"
+                        style={{ color: "#32332D" }}
+                      >
+                        I agree to the{" "}
+                        <a
+                          href="/terms"
+                          className="font-semibold transition-colors"
+                          style={{ color: "#F2742C" }}
+                        >
+                          Terms of Service
+                        </a>{" "}
+                        and{" "}
+                        <a
+                          href="/privacy"
+                          className="font-semibold transition-colors"
+                          style={{ color: "#F2742C" }}
+                        >
+                          Privacy Policy
+                        </a>
+                      </span>
                     }
                   />
-                  <FormControlLabel 
-                    value="professional" 
-                    control={
-                      <Radio 
-                        sx={{
-                          color: '#9CAF88',
-                          '&.Mui-checked': {
-                            color: '#722F37',
-                          },
-                        }}
-                      />
-                    } 
-                    label={
-                      <span className="text-[#8B4513] font-medium">Professional</span>
-                    }
-                  />
-                </RadioGroup>
-              </FormControl>
-              
-              {role === 'professional' && (
-                <div className="mt-4 p-4 bg-gradient-to-r from-[#F4C2C2] to-[#F5F5DC] rounded-lg border border-[#F4C2C2]">
-                  <div className="flex items-start">
-                    <Shield className="w-5 h-5 text-[#722F37] mr-2 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="text-[#722F37] font-semibold text-sm mb-1">Professional accounts require review</p>
-                      <p className="text-[#8B4513] text-sm">
-                        Please upload valid credentials for verification. Our team will notify you once your application is approved.
-                      </p>
-                    </div>
+                </div>
+
+                {/* Submit Button */}
+                <Button
+                  type="submit"
+                  variant="contained"
+                  fullWidth
+                  disabled={loading}
+                  sx={{
+                    backgroundColor: "#F2742C",
+                    borderRadius: "50px",
+                    padding: { xs: "8px", sm: "10px" },
+                    fontSize: { xs: "12px", sm: "13px" },
+                    fontWeight: 600,
+                    textTransform: "none",
+                    fontFamily: "'Poppins', sans-serif",
+                    boxShadow: "0 4px 12px rgba(242, 116, 44, 0.3)",
+                    "&:hover": {
+                      backgroundColor: "#E55A1F",
+                      boxShadow: "0 6px 16px rgba(242, 116, 44, 0.4)",
+                    },
+                    "&:disabled": {
+                      backgroundColor: "#AA855B",
+                    },
+                  }}
+                >
+                  {loading ? (
+                    <CircularProgress
+                      size={20}
+                      sx={{
+                        color: "white",
+                        "&.MuiCircularProgress-root": {
+                          width: { xs: "20px", sm: "24px" },
+                          height: { xs: "20px", sm: "24px" },
+                        },
+                      }}
+                    />
+                  ) : (
+                    <span className="flex items-center justify-center">
+                      Create Account
+                      <ArrowRight className="ml-1.5 sm:ml-2 w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    </span>
+                  )}
+                </Button>
+
+                {/* Error Display */}
+                {error && (
+                  <div className="text-center">
+                    <p className="text-xs sm:text-sm text-red-600 font-medium flex items-center justify-center">
+                      <Shield className="w-3.5 h-3 sm:w-4 sm:h-3 mr-1 sm:mr-1.5" />
+                      {error}
+                    </p>
+                  </div>
+                )}
+
+                {/* Divider */}
+                <div className="relative my-3 sm:my-4 md:my-5">
+                  <div className="absolute inset-0 flex items-center">
+                    <div
+                      className="w-full border-t"
+                      style={{ borderColor: "#AA855B" }}
+                    ></div>
+                  </div>
+                  <div className="relative flex justify-center text-[10px] sm:text-xs">
+                    <span
+                      className="px-3 sm:px-4 font-medium"
+                      style={{ backgroundColor: "#F5F5F5", color: "#32332D" }}
+                    >
+                      or continue with
+                    </span>
                   </div>
                 </div>
-              )}
+
+                {/* Google Sign In */}
+                <GoogleSignInButton
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                  disabled={loading}
+                  loading={loading}
+                  text="Continue with Google"
+                />
+
+                {/* Sign In Link */}
+                <div className="text-center pt-2 sm:pt-3">
+                  <p
+                    className="text-[10px] sm:text-xs"
+                    style={{ color: "#32332D" }}
+                  >
+                    Already have an account?{" "}
+                    <Link
+                      to="/login"
+                      className="font-semibold transition-colors"
+                      style={{ color: "#F2742C" }}
+                    >
+                      Sign In
+                    </Link>
+                  </p>
+                </div>
+              </form>
             </div>
 
-            {/* Form Fields */}
-            <div className="space-y-4">
-              <TextField
-                label="Username"
-                value={username}
-                onChange={e => setUsername(e.target.value)}
-                fullWidth
-                required
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: '12px',
-                    backgroundColor: '#F5F5DC',
-                    '&:hover': {
-                      backgroundColor: '#F0F0D0',
-                    },
-                    '&.Mui-focused': {
-                      backgroundColor: 'white',
-                      boxShadow: '0 0 0 2px #9CAF88',
-                    },
-                  },
-                  '& .MuiInputLabel-root': {
-                    color: '#8B4513',
-                    fontWeight: 500,
-                  },
-                }}
-              />
-              
-              <TextField
-                label="Email"
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                fullWidth
-                required
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: '12px',
-                    backgroundColor: '#F5F5DC',
-                    '&:hover': {
-                      backgroundColor: '#F0F0D0',
-                    },
-                    '&.Mui-focused': {
-                      backgroundColor: 'white',
-                      boxShadow: '0 0 0 2px #9CAF88',
-                    },
-                  },
-                  '& .MuiInputLabel-root': {
-                    color: '#8B4513',
-                    fontWeight: 500,
-                  },
-                }}
-              />
-              
-              <TextField
-                label="Password"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                fullWidth
-                required
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton 
-                        onClick={() => setShowPassword(!showPassword)}
-                        sx={{ color: '#8B4513' }}
-                      >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: '12px',
-                    backgroundColor: '#F5F5DC',
-                    '&:hover': {
-                      backgroundColor: '#F0F0D0',
-                    },
-                    '&.Mui-focused': {
-                      backgroundColor: 'white',
-                      boxShadow: '0 0 0 2px #9CAF88',
-                    },
-                  },
-                  '& .MuiInputLabel-root': {
-                    color: '#8B4513',
-                    fontWeight: 500,
-                  },
-                }}
-              />
-              
-              <TextField
-                label="Confirm Password"
-                type={showPassword ? 'text' : 'password'}
-                value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
-                fullWidth
-                required
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: '12px',
-                    backgroundColor: '#F5F5DC',
-                    '&:hover': {
-                      backgroundColor: '#F0F0D0',
-                    },
-                    '&.Mui-focused': {
-                      backgroundColor: 'white',
-                      boxShadow: '0 0 0 2px #9CAF88',
-                    },
-                  },
-                  '& .MuiInputLabel-root': {
-                    color: '#8B4513',
-                    fontWeight: 500,
-                  },
-                }}
-              />
-            </div>
-
-            {/* Terms and Conditions */}
-            <div className="bg-[#F5F5DC] rounded-xl p-4">
-              <FormControlLabel
-                control={
-                  <Checkbox 
-                    checked={acceptTerms} 
-                    onChange={e => setAcceptTerms(e.target.checked)}
-                    sx={{
-                      color: '#9CAF88',
-                      '&.Mui-checked': {
-                        color: '#722F37',
-                      },
-                    }}
+            {/* RIGHT SIDE - Welcome Section */}
+            <div
+              className="hidden md:flex p-6 md:p-7 flex-col justify-between items-center text-center"
+              style={{ backgroundColor: "#FAEFE2" }}
+            >
+              <div className="flex-1 flex flex-col justify-center items-center">
+                {/* Logo */}
+                <div className="py-2">
+                  <img
+                    src="/logos/parenzing-middle-logo-350x350-black.png"
+                    alt="ParenZing Logo"
+                    className="w-48 lg:w-56 h-auto mx-auto"
                   />
-                }
-                label={
-                  <span className="text-[#8B4513] text-sm">
-                    I agree to the{' '}
-                    <a href="/terms" className="text-[#722F37] hover:text-[#8B4513] font-semibold transition-colors">
-                      Terms of Service
-                    </a>{' '}
-                    and{' '}
-                    <a href="/privacy" className="text-[#722F37] hover:text-[#8B4513] font-semibold transition-colors">
-                      Privacy Policy
-                    </a>
-                  </span>
-                }
-              />
-            </div>
-
-            {/* Submit Button */}
-            <Button
-              type="submit"
-              variant="contained"
-              fullWidth
-              disabled={loading}
-              sx={{
-                backgroundColor: '#722F37',
-                borderRadius: '12px',
-                padding: '14px',
-                fontSize: '16px',
-                fontWeight: 600,
-                textTransform: 'none',
-                boxShadow: '0 4px 12px rgba(114, 47, 55, 0.3)',
-                '&:hover': {
-                  backgroundColor: '#5A2530',
-                  boxShadow: '0 6px 16px rgba(114, 47, 55, 0.4)',
-                },
-                '&:disabled': {
-                  backgroundColor: '#D1D5DB',
-                },
-              }}
-            >
-              {loading ? (
-                <CircularProgress size={24} sx={{ color: 'white' }} />
-              ) : (
-                <span className="flex items-center justify-center">
-                  Create Account
-                  <ArrowRight className="ml-2 w-4 h-4" />
-                </span>
-              )}
-            </Button>
-
-            {/* Divider */}
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-[#6B8CAE] font-medium">or continue with</span>
-              </div>
-            </div>
-
-            {/* Google Sign In */}
-            <Button
-              variant="outlined"
-              fullWidth
-              onClick={handleGoogleSignIn}
-              disabled={loading}
-              sx={{
-                borderColor: '#6B8CAE',
-                color: '#6B8CAE',
-                borderRadius: '12px',
-                padding: '12px',
-                fontSize: '16px',
-                fontWeight: 600,
-                textTransform: 'none',
-                borderWidth: '2px',
-                '&:hover': {
-                  borderColor: '#722F37',
-                  color: '#722F37',
-                  backgroundColor: '#F5F5DC',
-                },
-                '&:disabled': {
-                  borderColor: '#D1D5DB',
-                  color: '#D1D5DB',
-                },
-              }}
-            >
-              <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-              </svg>
-              Continue with Google
-            </Button>
-
-            {/* Error Display */}
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
-                <div className="flex items-center justify-center text-red-600">
-                  <Shield className="w-4 h-4 mr-2" />
-                  {error}
                 </div>
               </div>
-            )}
 
-            {/* Sign In Link */}
-            <div className="text-center pt-4">
-              <p className="text-[#6B8CAE]">
-                Already have an account?{' '}
-                <Link 
-                  to="/login" 
-                  className="text-[#722F37] hover:text-[#8B4513] font-semibold transition-colors"
+              {/* Footer */}
+              <div className="mt-4">
+                <div
+                  className="flex items-center justify-center space-x-2"
+                  style={{ color: "#AA855B" }}
                 >
-                  Sign In
-                </Link>
-              </p>
+                  <Heart className="w-4 h-4" />
+                  <span className="text-xs font-semibold font-['Poppins']">
+                    Building stronger families together
+                  </span>
+                  <Heart className="w-4 h-4" />
+                </div>
+              </div>
             </div>
-          </form>
-        </div>
-
-        {/* Footer */}
-        <div className="text-center mt-8">
-          <div className="flex items-center justify-center space-x-2 text-[#9CAF88]">
-            <Heart className="w-4 h-4" />
-            <span className="text-sm font-medium">Building stronger families together</span>
-            <Heart className="w-4 h-4" />
           </div>
         </div>
       </div>
+
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        toastStyle={{
+          fontFamily: "'Poppins', sans-serif",
+          fontSize: "14px",
+        }}
+      />
     </div>
   );
 };

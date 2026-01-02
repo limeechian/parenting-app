@@ -1,3 +1,9 @@
+# Programmer Name: Ms. Lim Ee Chian, APD3F2505SE, Software Engineering Student, Bachelor of Science (Hons) in Software Engineering
+# Program Name: Dockerfile
+# Description: To define Docker container configuration for building and running the FastAPI backend application
+# First Written on: Monday, 29-Sep-2025
+# Edited on: Sunday, 10-Dec-2025
+
 # Use Python 3.9 slim image
 FROM python:3.9-slim
 

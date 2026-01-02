@@ -1,3 +1,9 @@
+# Programmer Name: Ms. Lim Ee Chian, APD3F2505SE, Software Engineering Student, Bachelor of Science (Hons) in Software Engineering
+# Program Name: .dockerignore
+# Description: To specify files and directories to exclude from Docker build context
+# First Written on: Monday, 29-Sep-2025
+# Edited on: Sunday, 10-Dec-2025
+
 # Python
 __pycache__/
 *.py[cod]
@@ -47,6 +53,42 @@ Thumbs.db
 .env.local
 
 # Build artifacts
-build/
 *.bat
-response.json 
+*.sh
+response.json
+
+# Deployment and setup scripts (not needed in container)
+deploy.bat
+deploy.sh
+deploy-ecs.bat
+setup-iam-roles.bat
+verify-aws-resources.bat
+verify-aws-resources.sh
+
+# AWS configuration files (not needed in container, env vars are in task definition)
+service-definition.json
+task-definition.json
+task-definition.template.json
+task-policy.json
+trust-policy.json
+env-aws-template.txt
+
+# Documentation
+*.md
+README.md
+
+# Project root folders (if build context includes parent directory)
+../MOCKDATA/
+../NOTES/
+../frontend/
+../node_modules/
+../.git/
+../venv/
+../amplify.yml
+../deploy.bat
+../deploy.sh
+../package.json
+../package-lock.json
+../env_template.txt
+../DEPLOYMENT_*.md
+../TOOLS_REQUIRED.md 

@@ -1,5 +1,15 @@
+# Programmer Name: Ms. Lim Ee Chian, APD3F2505SE, Software Engineering Student, Bachelor of Science (Hons) in Software Engineering
+# Program Name: env-aws-template.txt
+# Description: To provide template file for environment variables configuration for AWS deployment
+# First Written on: Monday, 29-Sep-2025
+# Edited on: Sunday, 10-Dec-2025
+
 # Database Configuration
 DATABASE_URL=postgresql://postgres.oqilidmqmeluvnruahne:[YOUR-SUPABASE-PASSWORD]@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres
+
+# Supabase Configuration
+SUPABASE_URL=https://your-project-id.supabase.co
+SUPABASE_KEY=your-supabase-anon-key
 
 # Security
 SECRET_KEY=your-secret-key-here

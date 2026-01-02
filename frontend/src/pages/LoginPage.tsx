@@ -1,355 +1,624 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { TextField, Button, Checkbox, FormControlLabel, InputAdornment, IconButton, CircularProgress } from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { signInWithGoogle } from '../firebase';
-import { Heart, Shield, Sparkles, ArrowRight } from 'lucide-react';
-import { sendLogin, getParentProfile, googleSignIn } from '../services/api';
+// Programmer Name: Ms. Lim Ee Chian, APD3F2505SE, Software Engineering Student, Bachelor of Science (Hons) in Software Engineering
+// Program Name: LoginPage.tsx
+// Description: To provide user authentication interface for login functionality
+// First Written on: Monday, 29-Sep-2025
+// Edited on: Sunday, 10-Dec-2025
 
+// Import React hooks for component state and lifecycle management
+import React, { useState, useEffect } from "react";
+// Import React Router hooks for navigation and URL parameters
+import {
+  useNavigate,
+  Link,
+  useSearchParams,
+  useLocation,
+} from "react-router-dom";
+// Import Material-UI components for form elements
+import {
+  TextField,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  InputAdornment,
+  IconButton,
+  CircularProgress,
+} from "@mui/material";
+// Import Material-UI icons for password visibility toggle
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+// Import lucide-react icons for decorative elements
+import { Shield, ArrowRight, Heart } from "lucide-react";
+// Import API functions for authentication
+import { sendLogin, googleSignIn } from "../services/api";
+// Import Google sign-in button component
+import GoogleSignInButton from "../components/GoogleSignInButton";
+// Import toast notification components
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+// Import Poppins font weights for consistent typography
+import "@fontsource/poppins/400.css";
+import "@fontsource/poppins/500.css";
+import "@fontsource/poppins/600.css";
+import "@fontsource/poppins/700.css";
 
+/**
+ * LoginPageProps interface
+ * Defines optional props for the LoginPage component
+ */
 interface LoginPageProps {
-  //onGoogleSignIn?: () => void;
-  onSuccessfulSignIn?: () => void;
+  onSuccessfulSignIn?: () => void; // Callback function called after successful login
 }
 
+/**
+ * LoginPage Component
+ *
+ * Provides user authentication interface with:
+ * - Email/password login form
+ * - Google sign-in option
+ * - Remember me functionality
+ * - Session expiry handling
+ * - Role-based dashboard routing
+ *
+ * @param props - Component props defined in LoginPageProps interface
+ * @returns JSX element representing the login page
+ */
 const LoginPage: React.FC<LoginPageProps> = ({ onSuccessfulSignIn }) => {
-  const [identifier, setIdentifier] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  // Form state management
+  const [email, setEmail] = useState(""); // User's email address
+  const [password, setPassword] = useState(""); // User's password
+  const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
+  const [rememberMe, setRememberMe] = useState(false); // Remember me checkbox state
+  const [error, setError] = useState(""); // Error message to display
+  const [loading, setLoading] = useState(false); // Loading state during authentication
+  const [sessionExpired, setSessionExpired] = useState(false); // Session expiry flag
 
+  // React Router hooks
+  const navigate = useNavigate(); // Navigation function for programmatic routing
+  const location = useLocation(); // Current route location
+  const [searchParams] = useSearchParams(); // URL search parameters
+
+  /**
+   * Returns the appropriate dashboard route based on user role
+   * Different user roles are redirected to their respective dashboards
+   *
+   * @param role - User's role (parent, professional, coordinator, content_manager, admin)
+   * @returns Dashboard route path string
+   */
+  const getDashboardRoute = (role: string): string => {
+    switch (role) {
+      case "admin":
+        return "/admin-dashboard";
+      case "coordinator":
+        return "/coordinator-dashboard";
+      case "content_manager":
+        return "/content-manager-dashboard";
+      case "professional":
+        return "/professional-dashboard";
+      case "parent":
+      default:
+        return "/parent-dashboard";
+    }
+  };
+
+  /**
+   * Checks if a user role requires profile setup on first login
+   * Only parent users need to complete profile setup
+   * Other roles go directly to their dashboards
+   *
+   * @param role - User's role
+   * @returns Boolean indicating if profile setup is needed
+   */
+  const needsProfileSetup = (role: string): boolean => {
+    // Only parent users need to go through setup-profile on first login
+    // Professional users go directly to their dashboard
+    // Admin, coordinator, and content_manager don't need profile setup
+    return role === "parent";
+  };
+
+  /**
+   * Effect hook to check for session expiry in URL parameters
+   * Displays a toast notification if user was redirected due to expired session
+   */
+  useEffect(() => {
+    if (searchParams.get("session_expired") === "true") {
+      setSessionExpired(true);
+      toast.info("Your session has expired. Please log in again.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
+  }, [searchParams]);
+
+  /**
+   * Returns Material-UI TextField styling configuration
+   * Includes autofill styling overrides to match application theme
+   *
+   * @param hasValue - Whether the text field has a value (affects background color)
+   * @returns Material-UI sx prop styling object
+   */
+  const getTextFieldStyles = (hasValue: boolean) => ({
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "12px",
+      backgroundColor: hasValue ? "#F5F5F5" : "#EDEDED",
+      fontFamily: "'Poppins', sans-serif",
+      "&:hover": {
+        //backgroundColor: "#F5F5F5",
+      },
+      "&.Mui-focused": {
+        //backgroundColor: "#F5F5F5",
+        //boxShadow: "0 0 0 2px #F2742C",
+      },
+      // Override browser autofill styling
+      "& input:-webkit-autofill": {
+        WebkitBoxShadow: "0 0 0 1000px #F5F5F5 inset !important",
+        WebkitTextFillColor: "#32332D !important",
+        transition: "background-color 5000s ease-in-out 0s",
+      },
+      "& input:-webkit-autofill:hover": {
+        //WebkitBoxShadow: "0 0 0 1000px #F5F5F5 inset !important",
+      },
+      "& input:-webkit-autofill:focus": {
+        //WebkitBoxShadow: "0 0 0 1000px #F5F5F5 inset !important",
+      },
+    },
+    "& .MuiInputLabel-root": {
+      color: "#32332D",
+      fontWeight: 500,
+      fontFamily: "'Poppins', sans-serif",
+      fontSize: "13px",
+    },
+    "& .MuiInputBase-input": {
+      fontSize: "13px",
+    },
+  });
+
+  /**
+   * Handles form submission for email/password login
+   * Authenticates user, stores token, and redirects to appropriate dashboard
+   *
+   * @param e - Form submission event
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
     try {
-      // Use the API service for login
-      const loginData = await sendLogin({ identifier: identifier, password });
-      
+      // Use the API service for login with remember_me option
+      const loginData = await sendLogin({
+        identifier: email,
+        password,
+        remember_me: rememberMe,
+      });
+
       // Store the JWT token in localStorage for subsequent API calls
       if (loginData.access_token) {
-        localStorage.setItem('auth_token', loginData.access_token);
-        console.log('Token stored in localStorage');
+        localStorage.setItem("auth_token", loginData.access_token);
+        console.log("Token stored in localStorage");
       }
-      
+
       // Wait a bit to ensure token is stored
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
-      // Store user identifier for profile setup
-      localStorage.setItem('userEmail', identifier);
-  
-      // Fetch parent profile to check completion using API service
-      try {
-        const profile = await getParentProfile();
-        // Check if important fields are filled
-        const requiredFields = [
-          'full_name',
-          'gender',
-          'age',
-          'relationship_with_child',
-          'relationship_status',
-          'parenting_style',
-        ];
-        const isComplete = requiredFields.every(
-          (field) =>
-            profile[field] !== null &&
-            profile[field] !== undefined &&
-            profile[field] !== '' &&
-            // For age, check for 0 (if you use 0 as default)
-            (field !== 'age' || profile[field] > 0)
-        );
-        if (isComplete) {
-          // Notify App.tsx that we just signed in successfully
-          if (onSuccessfulSignIn) {
-            onSuccessfulSignIn();
-            // Wait a tiny bit for React state to update before navigating
-            await new Promise(resolve => setTimeout(resolve, 100));
-          }
-          navigate('/parent-dashboard');
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      // Store user email for profile setup
+      localStorage.setItem("userEmail", email);
+
+      // Check if this is the first login (no profile exists)
+      // First login → Setup Profile (one-time)
+      // Subsequent logins → Dashboard (with soft reminders if profile incomplete)
+      if (onSuccessfulSignIn) {
+        onSuccessfulSignIn();
+        // Wait a tiny bit for React state to update before navigating
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+
+      // Check for return URL
+      const returnUrl =
+        (location.state as any)?.returnUrl || localStorage.getItem("returnUrl");
+      if (returnUrl) {
+        localStorage.removeItem("returnUrl");
+        navigate(returnUrl);
+      } else {
+        // Get user role from login response (default to 'parent' if not provided)
+        const userRole = loginData.role || "parent";
+        const dashboardRoute = getDashboardRoute(userRole);
+
+        // Check if this is first login and if role needs profile setup
+        // Parent users → setup-profile on first login
+        // Professional users → professional-dashboard on first login (they can submit profile from there)
+        // Other roles → their respective dashboards
+        if (loginData.isFirstLogin && needsProfileSetup(userRole)) {
+          console.log(
+            "First login detected for parent user, redirecting to setup profile",
+          );
+          navigate("/setup-profile");
         } else {
-          navigate('/setup-profile');
+          console.log(
+            `User role: ${userRole}, redirecting to ${dashboardRoute}`,
+          );
+          navigate(dashboardRoute);
         }
-      } catch (profileErr) {
-        // If profile not found, treat as incomplete
-        navigate('/setup-profile');
       }
     } catch (err: any) {
-      console.error('Login error:', err);
+      console.error("Login error:", err);
+      console.log("Error message:", err.message);
       if (err.message && err.message.includes("Google sign-in")) {
-        setError("This account was created with Google sign-in. Please use the 'Sign in with Google' button below.");
+        setError(
+          "This account was created with Google sign-in. Please use the 'Sign in with Google' button below.",
+        );
+      } else if (
+        err.message &&
+        err.message.includes("Please verify your email")
+      ) {
+        console.log("Showing toast notification for email verification error");
+        // Show toast notification for email verification error
+        toast.error("Please verify your email before logging in", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          style: {
+            fontFamily: "'Poppins', sans-serif",
+            fontSize: "14px",
+            backgroundColor: "#F2742C",
+            color: "#F5F5F5",
+            borderRadius: "8px",
+          },
+        });
+        setError(err.message);
+      } else if (
+        err.message &&
+        (err.message.includes("LOGIN_BAD_CREDENTIALS") ||
+          err.message.includes("Bad credentials"))
+      ) {
+        setError("Incorrect credentials. Please try again.");
       } else {
-        setError(err.message || 'Login failed');
+        setError(err.message || "Unable to sign in. Please try again.");
       }
     } finally {
       setLoading(false);
     }
   };
 
-  // Google sign-in handler
-  const handleGoogleSignIn = async () => {
-    console.log('Google sign-in button clicked');
-    setError('');
+  // Google sign-in success handler
+  const handleGoogleSuccess = async (idToken: string) => {
+    setError("");
     setLoading(true);
     try {
-      console.log('Calling signInWithGoogle...');
-      const result = await signInWithGoogle();
-      
-      console.log('Google sign-in successful, getting ID token...');
-      const idToken = await result.user.getIdToken();
-      localStorage.setItem('userEmail', result.user.email || '');
-      
-      console.log('Making request to /auth/google...');
-      const data = await googleSignIn(idToken, result.user.email || '');
-      
-      console.log('Response data:', data);
-      console.log('profileComplete:', data.profileComplete);
-      
+      // Decode token to get email
+      const payload = JSON.parse(atob(idToken.split(".")[1]));
+      const email = payload.email;
+
+      localStorage.setItem("userEmail", email);
+
+      console.log("Making request to /auth/google...");
+      const data = await googleSignIn(idToken, email);
+
+      console.log("Response data:", data);
+
       // Store the JWT token in localStorage for subsequent API calls
       if (data.access_token) {
-        localStorage.setItem('auth_token', data.access_token);
-        console.log('Token stored in localStorage');
+        localStorage.setItem("auth_token", data.access_token);
+        console.log("Token stored in localStorage");
       }
-      
+
       // Wait a bit to ensure token is stored
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
-      if (!data.profileComplete) {
-        console.log('Profile incomplete, navigating to setup-profile');
-        navigate("/setup-profile");
-      } else {
-        console.log('Profile complete, navigating to dashboard');
-        // Notify App.tsx that we just signed in successfully
-        if (onSuccessfulSignIn) {
-          onSuccessfulSignIn();
-          // Wait a tiny bit for React state to update before navigating
-          await new Promise(resolve => setTimeout(resolve, 100));
-        }
-        navigate("/parent-dashboard");
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      // Notify App.tsx that we just signed in successfully
+      if (onSuccessfulSignIn) {
+        onSuccessfulSignIn();
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
-    } catch (error) {
-      console.error('Google sign-in error:', error);
-      setError("Google sign-in failed");
+
+      // Check for return URL
+      const returnUrl =
+        (location.state as any)?.returnUrl || localStorage.getItem("returnUrl");
+      if (returnUrl) {
+        localStorage.removeItem("returnUrl");
+        navigate(returnUrl);
+      } else {
+        // Get user role from login response (default to 'parent' if not provided)
+        const userRole = data.role || "parent";
+        const dashboardRoute = getDashboardRoute(userRole);
+
+        // Check if this is first login and if role needs profile setup
+        // Parent users → setup-profile on first login
+        // Professional users → professional-dashboard on first login (they can submit profile from there)
+        // Other roles → their respective dashboards
+        if (data.isFirstLogin && needsProfileSetup(userRole)) {
+          console.log(
+            "First login detected for parent user, redirecting to setup profile",
+          );
+          navigate("/setup-profile");
+        } else {
+          console.log(
+            `User role: ${userRole}, redirecting to ${dashboardRoute}`,
+          );
+          navigate(dashboardRoute);
+        }
+      }
+    } catch (error: any) {
+      console.error("Google sign-in error:", error);
+      setError(
+        error.message ||
+          "Unable to sign in with Google. Please try again or use email/password login.",
+      );
     } finally {
       setLoading(false);
     }
+  };
+
+  // Google sign-in error handler
+  const handleGoogleError = (error: string) => {
+    console.error("Google sign-in error:", error);
+    setError(
+      "Google sign-in failed. Please try again or use email/password login.",
+    );
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F5F5DC] via-white to-[#F4C2C2] p-4">
-      <div className="w-full max-w-md">
-        {/* Header Section */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#9CAF88] to-[#8B4513] rounded-2xl mb-4 shadow-lg">
-            <Heart className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-[#8B4513] mb-2" style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>Welcome Back</h1>
-          <p className="text-[#6B8CAE] text-lg">Continue your parenting journey with us</p>
-        </div>
+    <div
+      className="min-h-screen flex items-center justify-center p-4"
+      style={{ backgroundColor: "#F5EFED" }}
+    >
+      {/* Main Split Card */}
+      <div className="w-full max-w-3xl">
+        <div
+          className="rounded-3xl shadow-xl transition-all duration-300 hover:shadow-2xl overflow-hidden"
+          style={{ border: "1px solid #AA855B" }}
+        >
+          <div className="grid md:grid-cols-2 min-h-[480px]">
+            {/* LEFT SIDE - Form Section */}
+            <div
+              className="p-6 md:p-8 flex flex-col justify-center"
+              style={{ backgroundColor: "#F5F5F5" }}
+            >
+              {/* Header - Visible on all screens */}
+              <div className="text-center mb-5">
+                <h1
+                  className="text-2xl font-bold mb-1.5 font-['Poppins']"
+                  style={{ color: "#32332D" }}
+                >
+                  Welcome Back
+                </h1>
+                <p className="text-xs" style={{ color: "#32332D" }}>
+                  Continue your parenting journey with us
+                </p>
+                {sessionExpired && (
+                  <div
+                    className="mt-3 p-3 rounded-lg text-center"
+                    style={{
+                      backgroundColor: "#FFF4E6",
+                      border: "1px solid #F2742C",
+                    }}
+                  >
+                    <p
+                      className="text-xs font-medium font-['Poppins']"
+                      style={{ color: "#F2742C" }}
+                    >
+                      Your session has expired. Please log in again.
+                    </p>
+                  </div>
+                )}
+              </div>
 
-        {/* Main Card */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-4">
-              <TextField
-                label="Username or Email"
-                type="text"
-                value={identifier}
-                onChange={e => setIdentifier(e.target.value)}
-                fullWidth
-                required
-                placeholder="Enter your username or email"
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: '12px',
-                    backgroundColor: '#F5F5DC',
-                    '&:hover': {
-                      backgroundColor: '#F0F0D0',
-                    },
-                    '&.Mui-focused': {
-                      backgroundColor: 'white',
-                      boxShadow: '0 0 0 2px #9CAF88',
-                    },
-                  },
-                  '& .MuiInputLabel-root': {
-                    color: '#8B4513',
-                    fontWeight: 500,
-                  },
-                }}
-              />
-              
-              <TextField
-                label="Password"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                fullWidth
-                required
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton 
-                        onClick={() => setShowPassword(!showPassword)}
-                        sx={{ color: '#8B4513' }}
-                      >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: '12px',
-                    backgroundColor: '#F5F5DC',
-                    '&:hover': {
-                      backgroundColor: '#F0F0D0',
-                    },
-                    '&.Mui-focused': {
-                      backgroundColor: 'white',
-                      boxShadow: '0 0 0 2px #9CAF88',
-                    },
-                  },
-                  '& .MuiInputLabel-root': {
-                    color: '#8B4513',
-                    fontWeight: 500,
-                  },
-                }}
-              />
-            </div>
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="space-y-4 mt-2">
+                  <TextField
+                    label="Email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    fullWidth
+                    required
+                    placeholder="Enter your email"
+                    sx={getTextFieldStyles(!!email)}
+                  />
 
-            <div className="flex items-center justify-between">
-              <FormControlLabel
-                control={
-                  <Checkbox 
-                    checked={rememberMe} 
-                    onChange={e => setRememberMe(e.target.checked)}
+                  <TextField
+                    label="Password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    fullWidth
+                    required
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => setShowPassword(!showPassword)}
+                            sx={{
+                              color: "#32332D",
+                              fontFamily: "'Poppins', sans-serif",
+                            }}
+                          >
+                            {showPassword ? <Visibility /> : <VisibilityOff />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                     sx={{
-                      color: '#9CAF88',
-                      '&.Mui-checked': {
-                        color: '#722F37',
-                      },
+                      mt: 2.5,
+                      ...getTextFieldStyles(!!password),
                     }}
                   />
-                }
-                label={
-                  <span className="text-[#8B4513] font-medium">Remember me</span>
-                }
-              />
-              <a href="/forgot-password" className="text-[#6B8CAE] hover:text-[#722F37] font-medium transition-colors">
-                Forgot password?
-              </a>
+                </div>
+
+                <div
+                  className="flex items-center justify-between"
+                  style={{ marginTop: "8px" }}
+                >
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
+                        sx={{
+                          color: "#AA855B",
+                          fontFamily: "'Poppins', sans-serif",
+                          "&.Mui-checked": {
+                            color: "#F2742C",
+                          },
+                        }}
+                      />
+                    }
+                    sx={{ fontFamily: "'Poppins', sans-serif" }}
+                    label={
+                      <span
+                        className="font-medium text-xs"
+                        style={{ color: "#32332D" }}
+                      >
+                        Remember me
+                      </span>
+                    }
+                  />
+                  <Link
+                    to="/forgot-password"
+                    className="font-semibold transition-colors text-xs"
+                    style={{ color: "#AA855B" }}
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+
+                <Button
+                  type="submit"
+                  variant="contained"
+                  fullWidth
+                  disabled={loading}
+                  sx={{
+                    backgroundColor: "#F2742C",
+                    borderRadius: "50px",
+                    padding: "10px",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    textTransform: "none",
+                    fontFamily: "'Poppins', sans-serif",
+                    boxShadow: "0 4px 12px rgba(242, 116, 44, 0.3)",
+                    "&:hover": {
+                      backgroundColor: "#E55A1F",
+                      boxShadow: "0 6px 16px rgba(242, 116, 44, 0.4)",
+                    },
+                    "&:disabled": {
+                      backgroundColor: "#AA855B",
+                    },
+                  }}
+                >
+                  {loading ? (
+                    <CircularProgress size={24} sx={{ color: "white" }} />
+                  ) : (
+                    <span className="flex items-center justify-center">
+                      Sign In
+                      <ArrowRight className="ml-2 w-4 h-4" />
+                    </span>
+                  )}
+                </Button>
+
+                {error && (
+                  <div className="text-center">
+                    <p className="text-sm text-red-600 font-medium flex items-center justify-center">
+                      <Shield className="w-4 h-3 mr-1.5" />
+                      {error}
+                    </p>
+                  </div>
+                )}
+
+                <div className="relative my-5">
+                  <div className="absolute inset-0 flex items-center">
+                    <div
+                      className="w-full border-t"
+                      style={{ borderColor: "#AA855B" }}
+                    ></div>
+                  </div>
+                  <div className="relative flex justify-center text-xs">
+                    <span
+                      className="px-4 font-medium"
+                      style={{ backgroundColor: "#F5F5F5", color: "#32332D" }}
+                    >
+                      or continue with
+                    </span>
+                  </div>
+                </div>
+
+                <GoogleSignInButton
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                  disabled={loading}
+                  loading={loading}
+                  text="Continue with Google"
+                />
+
+                <div className="text-center pt-3">
+                  <p className="text-xs" style={{ color: "#32332D" }}>
+                    Don't have an account?{" "}
+                    <Link
+                      to="/signup"
+                      className="font-semibold transition-colors"
+                      style={{ color: "#F2742C" }}
+                    >
+                      Sign Up
+                    </Link>
+                  </p>
+                </div>
+              </form>
             </div>
 
-            <Button
-              type="submit"
-              variant="contained"
-              fullWidth
-              disabled={loading}
-              sx={{
-                backgroundColor: '#722F37',
-                borderRadius: '12px',
-                padding: '12px',
-                fontSize: '16px',
-                fontWeight: 600,
-                textTransform: 'none',
-                boxShadow: '0 4px 12px rgba(114, 47, 55, 0.3)',
-                '&:hover': {
-                  backgroundColor: '#5A2530',
-                  boxShadow: '0 6px 16px rgba(114, 47, 55, 0.4)',
-                },
-                '&:disabled': {
-                  backgroundColor: '#D1D5DB',
-                },
-              }}
+            {/* RIGHT SIDE - Welcome Section */}
+            <div
+              className="hidden md:flex p-6 md:p-8 flex-col justify-between items-center text-center"
+              style={{ backgroundColor: "#FAEFE2" }}
             >
-              {loading ? (
-                <CircularProgress size={24} sx={{ color: 'white' }} />
-              ) : (
-                <span className="flex items-center justify-center">
-                  Sign In
-                  <ArrowRight className="ml-2 w-4 h-4" />
-                </span>
-              )}
-            </Button>
-
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-[#6B8CAE] font-medium">or continue with</span>
-              </div>
-            </div>
-
-            <Button
-              type="button"
-              variant="outlined"
-              fullWidth
-              onClick={handleGoogleSignIn}
-              disabled={loading}
-              sx={{
-                borderColor: '#6B8CAE',
-                color: '#6B8CAE',
-                borderRadius: '12px',
-                padding: '12px',
-                fontSize: '16px',
-                fontWeight: 600,
-                textTransform: 'none',
-                borderWidth: '2px',
-                '&:hover': {
-                  borderColor: '#722F37',
-                  color: '#722F37',
-                  backgroundColor: '#F5F5DC',
-                },
-                '&:disabled': {
-                  borderColor: '#D1D5DB',
-                  color: '#D1D5DB',
-                },
-              }}
-            >
-              <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-              </svg>
-              Continue with Google
-            </Button>
-
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
-                <div className="flex items-center justify-center text-red-600">
-                  <Shield className="w-4 h-4 mr-2" />
-                  {error}
+              <div className="flex-1 flex flex-col justify-center items-center">
+                {/* Logo */}
+                <div className="py-2">
+                  <img
+                    src="/logos/parenzing-middle-logo-350x350-black.png"
+                    alt="ParenZing Logo"
+                    className="w-56 h-auto mx-auto"
+                  />
                 </div>
               </div>
-            )}
 
-            <div className="text-center pt-4">
-              <p className="text-[#6B8CAE]">
-                Don't have an account?{' '}
-                <Link 
-                  to="/signup" 
-                  className="text-[#722F37] hover:text-[#8B4513] font-semibold transition-colors"
+              {/* Footer */}
+              <div className="mt-4">
+                <div
+                  className="flex items-center justify-center space-x-2"
+                  style={{ color: "#AA855B" }}
                 >
-                  Sign Up
-                </Link>
-              </p>
+                  <Heart className="w-4 h-4" />
+                  <span className="text-xs font-semibold font-['Poppins']">
+                    Building stronger families together
+                  </span>
+                  <Heart className="w-4 h-4" />
+                </div>
+              </div>
             </div>
-          </form>
-        </div>
-
-        {/* Footer */}
-        <div className="text-center mt-8">
-          <div className="flex items-center justify-center space-x-2 text-[#9CAF88]">
-            <Sparkles className="w-4 h-4" />
-            <span className="text-sm font-medium">Empowering parents, nurturing families</span>
-            <Sparkles className="w-4 h-4" />
           </div>
         </div>
       </div>
+
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        toastStyle={{
+          fontFamily: "'Poppins', sans-serif",
+          fontSize: "14px",
+        }}
+      />
     </div>
   );
 };

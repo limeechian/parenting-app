@@ -1,3 +1,9 @@
+REM Programmer Name: Ms. Lim Ee Chian, APD3F2505SE, Software Engineering Student, Bachelor of Science (Hons) in Software Engineering
+REM Program Name: deploy.bat
+REM Description: To automate the complete deployment process for ECS/Fargate backend deployment
+REM First Written on: Monday, 29-Sep-2025
+REM Edited on: Sunday, 10-Dec-2025
+
 @echo off
 REM Automated Deployment Script for Parenting App Backend (Windows)
 REM This script handles the complete deployment process for ECS/Fargate
@@ -20,6 +26,16 @@ if not exist "main.py" (
     pause
     exit /b 1
 )
+
+REM Check if Docker is running
+docker ps >nul 2>&1
+if %errorlevel% neq 0 (
+    echo [ERROR] Docker is not running!
+    echo [ERROR] Please start Docker Desktop and try again.
+    pause
+    exit /b 1
+)
+echo ✅ Docker is running
 
 echo [STEP] Step 1: Building Docker image...
 docker build -t %ECR_REPOSITORY_NAME% .
@@ -82,7 +98,22 @@ if %errorlevel% neq 0 (
 )
 echo ✅ Task definition registered: %TASK_DEF_ARN%
 
-echo [STEP] Step 8: Updating ECS service with new task definition...
+echo [STEP] Step 8: Checking ECS service status...
+for /f "tokens=*" %%i in ('aws ecs describe-services --cluster %ECS_CLUSTER_NAME% --services %ECS_SERVICE_NAME% --region %AWS_REGION% --query "services[0].desiredCount" --output text 2^>nul') do set CURRENT_DESIRED_COUNT=%%i
+
+if "%CURRENT_DESIRED_COUNT%"=="0" (
+    echo [INFO] Service is hibernated (desired count = 0). Restarting service...
+    aws ecs update-service --cluster %ECS_CLUSTER_NAME% --service %ECS_SERVICE_NAME% --desired-count 1 --region %AWS_REGION% >nul
+    if %errorlevel% neq 0 (
+        echo [ERROR] Failed to restart service!
+        pause
+        exit /b 1
+    )
+    echo ✅ Service restarted (desired count set to 1)
+    timeout /t 5 /nobreak >nul
+)
+
+echo [STEP] Step 9: Updating ECS service with new task definition...
 aws ecs update-service --cluster %ECS_CLUSTER_NAME% --service %ECS_SERVICE_NAME% --task-definition %TASK_DEF_ARN% --force-new-deployment --region %AWS_REGION% >nul
 if %errorlevel% neq 0 (
     echo [ERROR] Service update failed!
@@ -91,7 +122,7 @@ if %errorlevel% neq 0 (
 )
 echo ✅ Service updated successfully
 
-echo [STEP] Step 9: Monitoring deployment status...
+echo [STEP] Step 10: Monitoring deployment status...
 echo ⏳ Waiting for deployment to complete...
 
 REM Monitor deployment status
@@ -124,7 +155,7 @@ echo ⚠️  Deployment monitoring timed out. Please check the ECS console for s
 goto success
 
 :success
-echo [STEP] Step 10: Getting service information...
+echo [STEP] Step 11: Getting service information...
 for /f "tokens=*" %%i in ('aws ecs describe-services --cluster %ECS_CLUSTER_NAME% --services %ECS_SERVICE_NAME% --region %AWS_REGION% --query "services[0].runningCount" --output text') do set RUNNING_COUNT=%%i
 for /f "tokens=*" %%i in ('aws ecs describe-services --cluster %ECS_CLUSTER_NAME% --services %ECS_SERVICE_NAME% --region %AWS_REGION% --query "services[0].desiredCount" --output text') do set DESIRED_COUNT=%%i
 for /f "tokens=*" %%i in ('aws ecs describe-services --cluster %ECS_CLUSTER_NAME% --services %ECS_SERVICE_NAME% --region %AWS_REGION% --query "services[0].taskDefinition" --output text') do set TASK_DEF=%%i
