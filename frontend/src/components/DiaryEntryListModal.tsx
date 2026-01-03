@@ -28,6 +28,21 @@ import {
 } from "lucide-react";
 
 /**
+ * Formats tag/field value for display
+ * Converts strings with underscores to human-readable labels
+ * 
+ * @param value - String value (may contain underscores)
+ * @returns Formatted display string
+ */
+const formatFieldValue = (value: string): string => {
+  if (!value) return "";
+  return value
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
+
+/**
  * DiaryEntry interface
  * Defines the structure of a diary entry object with all possible fields
  */
@@ -233,13 +248,13 @@ const DiaryEntryListModal: React.FC<DiaryEntryListModalProps> = ({
 
       case "daily-behavior":
         const behaviors = entry.observed_behaviors?.length
-          ? entry.observed_behaviors.join(", ")
+          ? entry.observed_behaviors.map(formatFieldValue).join(", ")
           : "";
         const challenges = entry.challenges_encountered?.length
-          ? entry.challenges_encountered.join(", ")
+          ? entry.challenges_encountered.map(formatFieldValue).join(", ")
           : "";
         const strategies = entry.strategies_used?.length
-          ? entry.strategies_used.join(", ")
+          ? entry.strategies_used.map(formatFieldValue).join(", ")
           : "";
 
         let preview = "";
@@ -256,10 +271,10 @@ const DiaryEntryListModal: React.FC<DiaryEntryListModalProps> = ({
 
       case "emotional-tracking":
         const triggers = entry.triggers_identified?.length
-          ? entry.triggers_identified.join(", ")
+          ? entry.triggers_identified.map(formatFieldValue).join(", ")
           : "";
         const coping = entry.coping_strategies?.length
-          ? entry.coping_strategies.join(", ")
+          ? entry.coping_strategies.map(formatFieldValue).join(", ")
           : "";
 
         let emotionalPreview = "";
@@ -295,7 +310,7 @@ const DiaryEntryListModal: React.FC<DiaryEntryListModalProps> = ({
 
       case "milestone-progress":
         const skills = entry.skills_observed?.length
-          ? entry.skills_observed.join(", ")
+          ? entry.skills_observed.map(formatFieldValue).join(", ")
           : "";
 
         let milestonePreview = "";

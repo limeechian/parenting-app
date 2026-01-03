@@ -44,6 +44,21 @@ import {
 } from "../services/api";
 
 /**
+ * Formats tag for display
+ * Converts tag strings with underscores to human-readable labels
+ * 
+ * @param tag - Tag string (may contain underscores)
+ * @returns Formatted display string
+ */
+const formatTag = (tag: string): string => {
+  if (!tag) return "";
+  return tag
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
+
+/**
  * Service interface
  * Defines the structure of a professional service
  */
@@ -2319,7 +2334,7 @@ const AIChatPage: React.FC = () => {
                                                                     "#326586",
                                                                 }}
                                                               >
-                                                                {tag}
+                                                                {formatTag(tag)}
                                                               </span>
                                                             ),
                                                           )}

@@ -217,6 +217,32 @@ interface PromotionalMaterial {
   business_name?: string;
 }
 
+/**
+ * Formats developmental stage for display
+ * Converts stage codes to human-readable labels
+ * 
+ * @param stage - Developmental stage code
+ * @returns Formatted display string
+ */
+const formatDevelopmentalStage = (stage: string): string => {
+  const map: Record<string, string> = {
+    newborn: "Newborn",
+    infant: "Infant",
+    toddler: "Toddler",
+    early_childhood: "Early Childhood",
+    middle_childhood: "Middle Childhood",
+  };
+  return (
+    map[stage] ||
+    (stage
+      ? stage
+          .split("_")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ")
+      : "")
+  );
+};
+
 const CoordinatorDashboard: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<ActiveTab>(() => {
@@ -1873,9 +1899,7 @@ const CoordinatorDashboard: React.FC = () => {
                             (stage: string, idx: number) => (
                               <Chip
                                 key={idx}
-                                label={stage
-                                  .replace("_", " ")
-                                  .replace(/\b\w/g, (l) => l.toUpperCase())}
+                                label={formatDevelopmentalStage(stage)}
                                 size="small"
                                 sx={{
                                   backgroundColor: "#E8F5E9",

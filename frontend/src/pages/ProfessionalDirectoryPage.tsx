@@ -43,6 +43,32 @@ import "react-toastify/dist/ReactToastify.css";
 import { SPECIALIZATION_TAGS } from "../constants/specializationTags";
 
 /**
+ * Formats developmental stage for display
+ * Converts stage codes to human-readable labels
+ * 
+ * @param stage - Developmental stage code
+ * @returns Formatted display string
+ */
+const formatDevelopmentalStage = (stage: string): string => {
+  const map: Record<string, string> = {
+    newborn: "Newborn",
+    infant: "Infant",
+    toddler: "Toddler",
+    early_childhood: "Early Childhood",
+    middle_childhood: "Middle Childhood",
+  };
+  return (
+    map[stage] ||
+    (stage
+      ? stage
+          .split("_")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ")
+      : "")
+  );
+};
+
+/**
  * Constants for filter options
  */
 
@@ -1263,9 +1289,7 @@ const ProfessionalDirectoryPage: React.FC = () => {
                           color: "#0F5648",
                         }}
                       >
-                        {stage
-                          .replace("_", " ")
-                          .replace(/\b\w/g, (l) => l.toUpperCase())}
+                        {formatDevelopmentalStage(stage)}
                       </span>
                     ),
                   )}

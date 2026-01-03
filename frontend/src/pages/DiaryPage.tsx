@@ -91,6 +91,21 @@ import {
 } from "lucide-react";
 
 /**
+ * Formats tag for display
+ * Converts tag strings with underscores to human-readable labels
+ * 
+ * @param tag - Tag string (may contain underscores)
+ * @returns Formatted display string
+ */
+const formatTag = (tag: string): string => {
+  if (!tag) return "";
+  return tag
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
+
+/**
  * Calculates age from a birthdate string
  * 
  * @param birthdate - Birthdate string in YYYY-MM-DD format
@@ -4930,7 +4945,7 @@ const DiaryPage: React.FC = () => {
                       style={{ backgroundColor: "#F5F3F0", color: "#AA855B" }}
                     >
                       <Tag className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                      <span>{tag}</span>
+                      <span>{formatTag(tag)}</span>
                     </span>
                   ))}
                 </div>

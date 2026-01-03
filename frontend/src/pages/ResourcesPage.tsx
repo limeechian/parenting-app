@@ -55,6 +55,21 @@ import "@fontsource/poppins/600.css";
 import "@fontsource/poppins/700.css";
 
 /**
+ * Formats tag for display
+ * Converts tag strings with underscores to human-readable labels
+ * 
+ * @param tag - Tag string (may contain underscores)
+ * @returns Formatted display string
+ */
+const formatTag = (tag: string): string => {
+  if (!tag) return "";
+  return tag
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
+
+/**
  * Converts Markdown text to HTML
  * Supports headers, lists, bold, italic, and paragraphs
  * Same implementation as in ContentCreationPage.tsx
@@ -868,7 +883,7 @@ const ResourcesPage: React.FC = () => {
                   style={{ backgroundColor: "#F5F5F5", color: "#AA855B" }}
                 >
                   <Tag className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span>{tag}</span>
+                  <span>{formatTag(tag)}</span>
                 </span>
               ))}
             </div>
@@ -1788,7 +1803,7 @@ const ResourcesPage: React.FC = () => {
                               }}
                             >
                               <Tag className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                              <span>{tag}</span>
+                              <span>{formatTag(tag)}</span>
                             </span>
                           ))}
                         </div>
