@@ -1442,7 +1442,7 @@ const Profile: React.FC = () => {
       <Dialog
         open={editProfileModalOpen}
         onClose={closeEditProfileModal}
-        maxWidth="xl"
+        maxWidth="lg"
         fullWidth
         disableScrollLock={true}
         PaperProps={{
