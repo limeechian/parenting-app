@@ -2657,8 +2657,12 @@ const SetupProfile: React.FC = () => {
     <div className="min-h-screen grid lg:grid-cols-[7fr_3fr]">
       {/* LEFT PANEL - Fixed Header/Footer with Scrollable Content */}
       <div
-        className="flex flex-col h-screen"
-        style={{ backgroundColor: "#F5F5F5" }}
+        className="flex flex-col"
+        style={{
+          backgroundColor: "#F5F5F5",
+          height: "100dvh", // Dynamic viewport height for mobile browsers (accounts for browser UI)
+          minHeight: "100vh", // Fallback for browsers that don't support dvh
+        }}
       >
         {/* FIXED HEADER */}
         <div className="flex-none py-4 sm:py-6 px-4 sm:px-6 md:px-8">
@@ -2708,7 +2712,13 @@ const SetupProfile: React.FC = () => {
         </div>
 
         {/* FIXED NAVIGATION BUTTONS */}
-        <div className="flex-none px-4 sm:px-6 md:px-8 py-2 sm:py-3">
+        <div
+          className="flex-none px-4 sm:px-6 md:px-8 py-2 sm:py-3"
+          style={{
+            backgroundColor: "#F5F5F5",
+            paddingBottom: `calc(0.5rem + env(safe-area-inset-bottom, 0px))`,
+          }}
+        >
           <div
             className="max-w-3xl mx-auto pt-2.5 sm:pt-3"
             style={{ borderTop: "1px solid #AA855B" }}

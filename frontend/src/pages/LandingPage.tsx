@@ -1002,6 +1002,24 @@ const LandingPage: React.FC = () => {
               </span>
             </div>
           </div>
+
+          {/* Disclaimer */}
+          <div
+            className="mt-2 sm:mt-3 pt-4 sm:pt-5 border-t border-opacity-30"
+            style={{ borderColor: "transparent" }}
+          >
+            <p
+              className="text-[10px] sm:text-xs leading-relaxed text-center max-w-5xl mx-auto"
+              style={{ color: "#8B6F4A" }}
+            >
+              <strong className="font-semibold">Disclaimer:</strong> This is a
+              final year project for academic purposes. The application is not
+              scientifically proven, and information provided should not be
+              considered as professional medical or health advice. Please consult
+              with qualified professionals for personalized guidance. Thank you
+              for your understanding.
+            </p>
+          </div>
         </div>
       </footer>
     </div>
