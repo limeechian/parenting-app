@@ -1442,7 +1442,7 @@ const Profile: React.FC = () => {
       <Dialog
         open={editProfileModalOpen}
         onClose={closeEditProfileModal}
-        maxWidth="lg"
+        maxWidth="xl"
         fullWidth
         disableScrollLock={true}
         PaperProps={{
@@ -1604,10 +1604,6 @@ const Profile: React.FC = () => {
                   backgroundColor:
                     activeTab === tab.id ? "#AA855B" : "transparent",
                   color: activeTab === tab.id ? "white" : "#32332D",
-                  borderBottom:
-                    activeTab === tab.id
-                      ? "2px solid #F2742C"
-                      : "2px solid transparent",
                 }}
               >
                 <span>{tab.icon}</span>

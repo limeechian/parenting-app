@@ -36,8 +36,8 @@ ASYNC_DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg:/
 async_engine = create_async_engine(
     ASYNC_DATABASE_URL, 
     echo=True,  # Log all SQL queries (useful for debugging)
-    pool_size=20,  # Number of connections to keep in the pool (increased from default 5)
-    max_overflow=10,  # Maximum number of connections to create beyond pool_size
+    pool_size=10,  # Number of connections to keep in the pool (reduced to match Supabase pooler limit of 15)
+    max_overflow=5,  # Maximum number of connections to create beyond pool_size (max 15 total to match Supabase limit)
     pool_pre_ping=True,  # Verify connections are alive before using them
     pool_recycle=3600,  # Recycle connections after 1 hour to prevent stale connections
     pool_timeout=30  # Timeout (seconds) for getting a connection from the pool

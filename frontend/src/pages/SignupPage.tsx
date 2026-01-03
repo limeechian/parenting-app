@@ -162,12 +162,15 @@ const SignupPage: React.FC = () => {
     setLoading(true);
     try {
       // Use centralized API service - always 'parent' role for this page
+      // The backend hook (on_after_register) should automatically send verification email
       await sendSignup({ email, password, role: "parent" });
 
       // Store user email for email verification page
       localStorage.setItem("userEmail", email);
 
       // Redirect to email verification page instead of auto-login
+      // Note: Verification email should be sent automatically by backend hook
+      // If it's not received, user can use the "Resend Email" button
       navigate("/email-verification", { state: { email } });
     } catch (err: any) {
       console.error("Signup error:", err);
